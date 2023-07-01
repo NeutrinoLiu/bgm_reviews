@@ -1,4 +1,6 @@
 var GLOBAL_LIST = null;
+const RETRY = 3;
+const RETRY_INTERVAL = 2000;
 fetchList();
 function setupScroll() {
     window.onscroll = function (ev) {
@@ -26,11 +28,10 @@ function drawNewCards(n) {
 function fetchList(){
     const url = 'aHR0cHM6Ly9lYXN0YXNpYS5henVyZS5kYXRhLm1vbmdvZGItYXBpLmNvbS9hcHAvbHVja3ljb21tZW50LXZscW9mL2VuZHBvaW50L2x1Y2t5X2xpc3Q';
     const payload = 'eyJhcGkta2V5IjoiMVpiVW95dXk3NGtSN1NNNU9JNG1UbXVaSXFXYXJxR25IWkgxUGI1d29xZ1FxZWo4enZvb3NEMlRWS2JZQm4ydiJ9';
- 
-    $.ajax({
+    let ajax_req = {
         tryCount: 0,
-        retryLimit: 3,
-        retryInterval: 1000,
+        retryLimit: RETRY,
+        retryInterval: RETRY_INTERVAL,
         timeout: 10000,
         crossDomain: true,
         dataType: 'json',
@@ -46,16 +47,20 @@ function fetchList(){
             setupScroll();
         },
         error: function(resp) {
-            this.tryCount++;
-            if (this.tryCount <= this.retryLimit) {
-                setTimeout($.ajax(this), this.retryInterval);
-                console.log('[bgm_lucky] retry ...');
+            ajax_req.tryCount++;
+            if (ajax_req.tryCount <= ajax_req.retryLimit) {
+                setTimeout(function(){
+                                // console.log('[bgm_lucky] retry ...'); 
+                                $.ajax(ajax_req);
+                            }, ajax_req.retryInterval);
                 return;
             } else {
-                $('#canvas_inner').html("<h2>服务器正在ICU抢救中 ... 🚑</h2>");
+                $('#canvas_inner').html('<h2 style="text-align:center">服务器正在ICU抢救中 🚑 ... </h2>');
             }
+            return;
         }
-    });
+    };
+    $.ajax(ajax_req);
 
 }
 function addCard(cmt) {
@@ -82,10 +87,10 @@ function updateMetaInfo(cmt) {
     const card = $(`#${cmt.id}`);
     function updateUser() {
         const url = "https://api.bgm.tv/v0/users/" + cmt.uid;
-        $.ajax({
+        let ajax_req = {
             tryCount: 0,
-            retryLimit: 3,
-            retryInterval: 1000,
+            retryLimit: RETRY,
+            retryInterval: RETRY_INTERVAL,
             timeout: 3000,
             contentType: 'application/json',
             type: 'GET',
@@ -94,26 +99,27 @@ function updateMetaInfo(cmt) {
                 card.find(".user_name").html(resp.nickname);
             },
             error: function(resp) {
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    setTimeout($.ajax(this), this.retryInterval);
+                ajax_req.tryCount++;
+                if (ajax_req.tryCount <= ajax_req.retryLimit) {
+                    setTimeout(function(){$.ajax(ajax_req)}, ajax_req.retryInterval);
                     console.log('[bgm_lucky] retry ...');
                     return;
                 } else {
                     console.warn("[bgm_luck] bangumi api fails");
                 }
             }
-        });
+        }
+        $.ajax(ajax_req);
     }
     function backgroundTemplate(url) {
         return `linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)), url('${url}')`;
     }
     function updateSubject (){
         const url = "https://api.bgm.tv/v0/subjects/" + cmt.sid;
-        $.ajax({
+        let ajax_req = {
             tryCount: 0,
-            retryLimit: 3,
-            retryInterval: 1000,
+            retryLimit: RETRY,
+            retryInterval: RETRY_INTERVAL,
             timeout: 3000,
             contentType: 'application/json',
             type: 'GET',
@@ -125,16 +131,17 @@ function updateMetaInfo(cmt) {
                 card.find(".poster").css('background-image',`${backgroundTemplate(resp.images.common)}`);
             },
             error: function(resp) {
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    setTimeout($.ajax(this), this.retryInterval);
+                ajax_req.tryCount++;
+                if (ajax_req.tryCount <= ajax_req.retryLimit) {
+                    setTimeout(function(){$.ajax(ajax_req)}, ajax_req.retryInterval);
                     console.log('[bgm_lucky] retry ...');
                     return;
                 } else {
                     console.warn("[bgm_luck] bangumi api fails");
                 }
             }
-        });
+        };
+        $.ajax(ajax_req);
     }
     updateUser();
     updateSubject();
