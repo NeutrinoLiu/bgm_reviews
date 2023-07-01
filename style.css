@@ -155,16 +155,18 @@ p {
 .footer {
     margin-top: 30px;
     margin-bottom: 30px;
-    font-weight: 500;
+    font-weight: 600;
     color: rgb(104, 104, 104);
     text-align: center;
+    text-shadow: 0 0 4px #ffffff;
+    opacity: 0.6;
 }
 
 .footer a {
     text-decoration: none !important;
     margin-top: 30px;
     margin-bottom: 30px;
-    font-weight: 500;
+    font-weight: 600;
     color: rgb(99, 99, 99);
     text-align: center;
 }
