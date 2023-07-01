@@ -1,0 +1,157 @@
+* {
+    box-sizing: border-box;
+    /* magic string*/
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Roboto, Oxygen, Cantarell, "Fira Sans", "Liberation Sans", "Droid Sans", Ubuntu, "PingFang SC", "Noto Sans CJK SC", "Noto Sans SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    -webkit-font-smoothing: antialiased;
+    font-weight: 400;
+    font-style: normal;
+}
+
+body {
+    background-color: #f1f1f1;
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.9)), url('https://chii.in/pic/wallpaper/01.png');
+    background-color: rgba(255, 255, 255, 0.8);
+    background-blend-mode: overlay;
+    background-attachment: fixed;
+}
+
+#canvas {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+#canvas h1 {
+    font-size: 3em;
+    font-family: 'Outfit', sans-serif;
+    text-align: center;
+    font-weight: 500;
+    color: rgb(255, 255, 255);
+    text-shadow: 0 0 10px #ae485a;
+    /* text-shadow: -1px -1px 1px #a2a1a1, 1px 1px 1px #fff; */
+}
+
+p {
+    font-size: .9em;
+    padding: 0;
+    margin: 0;
+}
+
+.container {
+    justify-content:center;
+    margin: 0 auto;
+    display: grid;
+    grid-gap: 30px;
+    grid-template-columns: repeat(auto-fill, 300px);
+    grid-auto-rows: 10px;
+}
+
+p {
+    font-family: 'Noto Sans SC', sans-serif;
+}
+
+.card {
+    display: block;
+    grid-row: span 10;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    -moz-box-shadow: inset 0 1px 1px hsla(0, 0%, 100%, 0.3), inset 0 -1px 0 hsla(0, 0%, 100%, 0.1), 0 2px 4px hsla(0, 0%, 0%, 0.2);
+    -webkit-box-shadow: inset 0 1px 1px hsla(0, 0%, 100%, 0.3), inset 0 -1px 0 hsla(0, 0%, 100%, 0.1), 0 2px 4px hsla(0, 0%, 0%, 0.2);
+    box-shadow: inset 0 1px 1px hsla(0, 0%, 100%, 0.3), inset 0 -1px 0 hsla(0, 0%, 100%, 0.1), 0 2px 4px hsla(0, 0%, 0%, 0.2);
+    backdrop-filter: blur(20px) contrast(95%);
+    -webkit-backdrop-filter: blur(20px) contrast(95%);
+    border: 1px solid #EEE;
+    background: rgba(254,254,254,0.6);
+    overflow:hidden;
+}
+
+.poster {
+    width: 100%;
+    height: 250px;
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)), url('https://lain.bgm.tv/pic/cover/l/7c/bd/349039_b4QZQ.jpg');
+    /* border-style: solid;
+    border-color: yellow; */
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: visible;
+}
+
+.subject_title {
+    text-shadow: 0 0 10px #343434;
+    font-size: .9em;
+    color: white;
+    line-height: 1.3;
+    text-align: left;
+    width: 78%;
+    position:absolute;
+    z-index: 10;
+    margin: 17px 0px 20px 20px;
+    cursor: pointer;
+}
+.subject_title p {
+    /* font-family: 'Noto Sans SC'; */
+    font-weight: 500;
+}
+
+.user_title {
+    margin:10px 15px 0px 15px;
+    width:200px;
+    white-space:nowrap;
+    overflow:hidden;
+}
+.user_title a {
+    text-decoration: none !important;
+    font-weight: 500;
+    color: rgb(67, 67, 67);
+}
+.user_title p {
+    margin: 4px 0 1px 0;
+    font-size:.9em;
+    color: rgb(117, 116, 116);
+    font-weight: 500;
+}
+
+.like_icon {
+    position:absolute;
+    cursor:pointer;
+    right:0;
+    margin-right:15px;
+    z-index:12;
+    display:inline-block;
+    opacity:0.6;
+    top: 265px;
+}
+
+.like_number {
+    text-align: right;
+    font-size: 1.0em;
+    font-weight: 500;
+    position:absolute;
+    cursor:pointer;
+    right:0;
+    margin-right:48px;
+    z-index:12;
+    display:inline-block;
+    opacity:0.6;
+    top: 268px;
+}
+
+.comment_container {
+    z-index: 10;
+    /* background: rgba(254,254,254,0.3); */
+    /* border-style: solid;
+    border-color: red; */
+}
+
+.comment {
+    text-align: justify;
+    color: rgb(53, 53, 53);
+    /* border-style: solid;
+    border-color: green; */
+    width: auto;
+    padding: 5px 15px 15px 15px;
+    width: 100%;
+}
+.comment p {
+    font-weight: 400;
+}
