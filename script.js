@@ -37,7 +37,7 @@ function fetchList(){
         data : atob(payload),
         success: function(resp) {
             storeCache(resp);
-            drawNewCards(10);
+            drawNewCards(15);
             setupScroll();
         },
         error: function(resp) {
