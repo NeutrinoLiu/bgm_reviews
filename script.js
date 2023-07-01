@@ -1,6 +1,6 @@
 var GLOBAL_LIST = null;
 const RETRY = 3;
-const RETRY_INTERVAL = 2000;
+const RETRY_INTERVAL = 3000;
 fetchList();
 function setupScroll() {
     window.onscroll = function (ev) {
