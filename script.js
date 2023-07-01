@@ -1,12 +1,27 @@
+var GLOBAL_LIST = null;
 fetchList();
-// setupScroll();
 function setupScroll() {
     window.onscroll = function (ev) {
-        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight)) {
-            const container = document.querySelector('.container');
-            container.insertAdjacentHTML('beforeend', `${'<div class="box"></div>'.repeat(50)}`);
-        }
+        if (GLOBAL_LIST)
+            if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight)) {
+                drawNewCards(10);
+            }
     };
+}
+function storeCache(resp) {
+    GLOBAL_LIST = {
+        'start' : 0,
+        'list' : resp
+    }
+}
+function drawNewCards(n) {
+    if (GLOBAL_LIST['start'] == GLOBAL_LIST['list'].length) {return}
+    const start = GLOBAL_LIST['start'];
+    for (let i = start; 
+            i < Math.min(GLOBAL_LIST['list'].length, start+n); i++ ) {
+        addCard(GLOBAL_LIST['list'][i]);
+        GLOBAL_LIST['start'] += 1;
+    }
 }
 function fetchList(){
     const url = 'aHR0cHM6Ly9lYXN0YXNpYS5henVyZS5kYXRhLm1vbmdvZGItYXBpLmNvbS9hcHAvbHVja3ljb21tZW50LXZscW9mL2VuZHBvaW50L2x1Y2t5X2xpc3Q';
@@ -21,9 +36,9 @@ function fetchList(){
         url: atob(url),
         data : atob(payload),
         success: function(resp) {
-            for (var cmt of resp) {
-                addCard(cmt)
-            }
+            storeCache(resp);
+            drawNewCards(10);
+            setupScroll();
         },
         error: function(resp) {
             $('#canvas').html("服务器正在ICU抢救中 ... ")
