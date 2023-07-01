@@ -37,9 +37,9 @@ p {
     justify-content:center;
     margin: 0 auto;
     display: grid;
-    grid-gap: 30px;
+    grid-gap: 5px;
     grid-template-columns: repeat(auto-fill, 300px);
-    grid-auto-rows: 10px;
+    grid-auto-rows: 5px;
 }
 
 p {
@@ -47,6 +47,7 @@ p {
 }
 
 .card {
+    margin: 10px 10px 10px 10px;
     position: relative;
     display: block;
     grid-row: span 10;
@@ -82,7 +83,7 @@ p {
     color: white;
     line-height: 1.3;
     text-align: left;
-    width: 260px;
+    width: 240px;
     position:absolute;
     z-index: 10;
     margin: 17px 0px 20px 20px;
