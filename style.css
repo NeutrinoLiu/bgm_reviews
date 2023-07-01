@@ -9,7 +9,7 @@
 
 body {
     background-color: #f1f1f1;
-    background-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.9)), url('https://chii.in/pic/wallpaper/01.png');
+    background-image:  url('https://chii.in/pic/wallpaper/01.png');
     background-color: rgba(255, 255, 255, 0.8);
     background-blend-mode: overlay;
     background-attachment: fixed;
@@ -155,4 +155,21 @@ p {
 }
 .comment p {
     font-weight: 400;
+}
+
+footer {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    font-weight: 500;
+    color: rgb(131, 131, 131);
+    text-align: center;
+}
+
+footer a {
+    text-decoration: none !important;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    font-weight: 500;
+    color: rgb(157, 156, 156);
+    text-align: center;
 }
