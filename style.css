@@ -44,6 +44,7 @@ p {
 
 
 .card {
+    opacity: 0;
     margin: 10px 10px 10px 10px;
     position: relative;
     display: block;
@@ -59,7 +60,7 @@ p {
     border: 1px solid #EEE;
     background: rgba(254,254,254,0.6);
     overflow:hidden;
-    transition: opacity 1s ease-in;
+    transition: opacity .7s ease-out;
 }
 
 .poster {

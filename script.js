@@ -1,6 +1,6 @@
 var GLOBAL_LIST = null;
 const RETRY = 3;
-const RETRY_INTERVAL = 3000;
+const RETRY_INTERVAL = 2000;
 fetchList();
 function setupScroll() {
     window.onscroll = function (ev) {
@@ -129,6 +129,7 @@ function updateMetaInfo(cmt) {
                 card.find(".subject_name").html(resp.name);
                 card.find(".subject_cname").html(resp.name_cn);
                 card.find(".poster").css('background-image',`${backgroundTemplate(resp.images.common)}`);
+                card.css('opacity', 1);
             },
             error: function(resp) {
                 ajax_req.tryCount++;
@@ -138,6 +139,7 @@ function updateMetaInfo(cmt) {
                     return;
                 } else {
                     console.warn("[bgm_luck] bangumi api fails");
+                    card.css('opacity', 1);
                 }
             }
         };
