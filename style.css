@@ -112,24 +112,22 @@ p {
 
 .like_icon {
     position: absolute;
-    cursor:pointer;
     right:0;
     margin-right:15px;
     z-index:12;
-    opacity:0.6;
-    top: 265px;
+    opacity:0.7;
+    top: 267px;
 }
 .like_number {
     position: absolute;
     text-align: right;
     font-size: 1.1em;
     font-weight: 500;
-    cursor:pointer;
     right:0;
     margin-right:48px;
     z-index:12;
-    opacity:0.6;
-    top: 267px;
+    opacity:0.7;
+    top: 269px;
 }
 
 .comment_container {
