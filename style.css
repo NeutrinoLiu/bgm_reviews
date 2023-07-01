@@ -10,7 +10,6 @@
 body {
     background-image:  url('bg.png');
     background-color: rgba(255, 255, 255, 0.8);
-    background-blend-mode: overlay;
     background-attachment: fixed;
 }
 
@@ -24,7 +23,7 @@ body {
     text-align: center;
     font-weight: 500;
     color: rgb(255, 255, 255);
-    text-shadow: 0 0 10px #ae485a;
+    text-shadow: 0 0 10px #a84c5d;
     /* text-shadow: -1px -1px 1px #a2a1a1, 1px 1px 1px #fff; */
 }
 
@@ -103,12 +102,12 @@ p {
 .user_title a {
     text-decoration: none !important;
     font-weight: 500;
-    color: rgb(67, 67, 67);
+    color: rgb(70, 70, 70);
 }
 .user_title p {
     margin: 4px 0 1px 0;
     font-size:.9em;
-    color: rgb(117, 116, 116);
+    color: rgb(70, 70, 70);
     font-weight: 500;
 }
 
@@ -145,7 +144,7 @@ p {
 
 .comment {
     text-align: justify;
-    color: rgb(53, 53, 53);
+    color: rgb(70, 70, 70);
     /* border-style: solid;
     border-color: green; */
     width: auto;
@@ -160,7 +159,7 @@ p {
     margin-top: 30px;
     margin-bottom: 30px;
     font-weight: 500;
-    color: rgb(131, 131, 131);
+    color: rgb(104, 104, 104);
     text-align: center;
 }
 
@@ -169,6 +168,6 @@ p {
     margin-top: 30px;
     margin-bottom: 30px;
     font-weight: 500;
-    color: rgb(157, 156, 156);
+    color: rgb(99, 99, 99);
     text-align: center;
 }
