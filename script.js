@@ -115,7 +115,7 @@ function updateMetaInfo(cmt) {
         return `linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)), url('${url}')`;
     }
     function updateSubject (){
-        const url = "https://api.bgm.tv/v0/subjects/" + cmt.sid;
+        const url = "https://api.btgm.tv/v0/subjects/" + cmt.sid;
         let ajax_req = {
             tryCount: 0,
             retryLimit: RETRY,
@@ -133,13 +133,13 @@ function updateMetaInfo(cmt) {
             },
             error: function(resp) {
                 ajax_req.tryCount++;
+                card.css('opacity', 1);
                 if (ajax_req.tryCount <= ajax_req.retryLimit) {
                     setTimeout(function(){$.ajax(ajax_req)}, ajax_req.retryInterval);
                     console.log('[bgm_lucky] retry ...');
                     return;
                 } else {
                     console.warn("[bgm_luck] bangumi api fails");
-                    card.css('opacity', 1);
                 }
             }
         };
