@@ -149,7 +149,8 @@ function updateMetaInfo(cmt) {
 function cardTemplate(cmt) {
     const uURL = "https://bgm.tv/user/" + cmt.uid;
     const sURL = 'https://bgm.tv/subject/' + cmt.sid;
-
+    const date = new Date(cmt.time);
+    const timestamp = '上一次点赞 ' + date.toLocaleTimeString() + ' ' + date.toLocaleDateString();
     function buildStar(nStar) {
         let half_star = '';
         if (nStar % 2) {
@@ -190,9 +191,10 @@ function cardTemplate(cmt) {
         </div>
     `
     const card = `
-        <div class="card" id=${cmt.id}>
+        <div class="card" id=${cmt.id} title="${timestamp}">
             ${title}${poster}${comment_container}${like_icon}
-        </div>`;
+        </div> 
+        `;
     return card;
 }
 
