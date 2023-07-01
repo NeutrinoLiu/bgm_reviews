@@ -21,7 +21,7 @@ body {
     font-size: 3em;
     font-family: 'Outfit', sans-serif;
     text-align: center;
-    font-weight: 500;
+    font-weight: 700;
     color: rgb(255, 255, 255);
     text-shadow: 0 0 10px #a84c5d;
     /* text-shadow: -1px -1px 1px #a2a1a1, 1px 1px 1px #fff; */
@@ -42,9 +42,6 @@ p {
     grid-auto-rows: 10px;
 }
 
-p {
-    font-family: 'Noto Sans SC', sans-serif;
-}
 
 .card {
     margin: 10px 10px 10px 10px;
@@ -92,7 +89,7 @@ p {
 }
 .subject_title p {
     /* font-family: 'Noto Sans SC'; */
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .user_title {
