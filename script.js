@@ -26,7 +26,11 @@ function drawNewCards(n) {
 function fetchList(){
     const url = 'aHR0cHM6Ly9lYXN0YXNpYS5henVyZS5kYXRhLm1vbmdvZGItYXBpLmNvbS9hcHAvbHVja3ljb21tZW50LXZscW9mL2VuZHBvaW50L2x1Y2t5X2xpc3Q';
     const payload = 'eyJhcGkta2V5IjoiMVpiVW95dXk3NGtSN1NNNU9JNG1UbXVaSXFXYXJxR25IWkgxUGI1d29xZ1FxZWo4enZvb3NEMlRWS2JZQm4ydiJ9';
+ 
     $.ajax({
+        tryCount: 0,
+        retryLimit: 3,
+        retryInterval: 1000,
         timeout: 10000,
         crossDomain: true,
         dataType: 'json',
@@ -42,12 +46,30 @@ function fetchList(){
             setupScroll();
         },
         error: function(resp) {
-            $('#canvas').html("服务器正在ICU抢救中 ... ")
+            this.tryCount++;
+            if (this.tryCount <= this.retryLimit) {
+                setTimeout($.ajax(this), this.retryInterval);
+                console.log('[bgm_lucky] retry ...');
+                return;
+            } else {
+                $('#canvas_inner').html("<h2>服务器正在ICU抢救中 ... 🚑</h2>");
+            }
         }
     });
+
 }
 function addCard(cmt) {
+    cmt.uid = cmt.uid.replace(/^\uFEFF/gm, "");
     $('.container').append(cardTemplate(cmt));
+    const likebtn =$(`#${cmt.id}`).find('.like_icon');
+    const likenumber=$(`#${cmt.id}`).find('.like_number');
+    likebtn.on( "click", function(){
+        if (likenumber.is(":hidden")) {
+            likenumber.fadeIn(300);
+        } else {
+            likenumber.fadeOut(300);
+        }
+    });
     resizeGridItem(cmt.id);
     updateMetaInfo(cmt);
 }
@@ -61,7 +83,10 @@ function updateMetaInfo(cmt) {
     function updateUser() {
         const url = "https://api.bgm.tv/v0/users/" + cmt.uid;
         $.ajax({
-            timeout: 2000,
+            tryCount: 0,
+            retryLimit: 3,
+            retryInterval: 1000,
+            timeout: 3000,
             contentType: 'application/json',
             type: 'GET',
             url: url,
@@ -69,7 +94,14 @@ function updateMetaInfo(cmt) {
                 card.find(".user_name").html(resp.nickname);
             },
             error: function(resp) {
-                console.warn("[bgm_luck] bangumi api fails");
+                this.tryCount++;
+                if (this.tryCount <= this.retryLimit) {
+                    setTimeout($.ajax(this), this.retryInterval);
+                    console.log('[bgm_lucky] retry ...');
+                    return;
+                } else {
+                    console.warn("[bgm_luck] bangumi api fails");
+                }
             }
         });
     }
@@ -79,7 +111,10 @@ function updateMetaInfo(cmt) {
     function updateSubject (){
         const url = "https://api.bgm.tv/v0/subjects/" + cmt.sid;
         $.ajax({
-            timeout: 2000,
+            tryCount: 0,
+            retryLimit: 3,
+            retryInterval: 1000,
+            timeout: 3000,
             contentType: 'application/json',
             type: 'GET',
             url: url,
@@ -90,7 +125,14 @@ function updateMetaInfo(cmt) {
                 card.find(".poster").css('background-image',`${backgroundTemplate(resp.images.common)}`);
             },
             error: function(resp) {
-                console.warn("[bgm_luck] bangumi api fails");
+                this.tryCount++;
+                if (this.tryCount <= this.retryLimit) {
+                    setTimeout($.ajax(this), this.retryInterval);
+                    console.log('[bgm_lucky] retry ...');
+                    return;
+                } else {
+                    console.warn("[bgm_luck] bangumi api fails");
+                }
             }
         });
     }
