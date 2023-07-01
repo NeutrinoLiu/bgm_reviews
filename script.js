@@ -2,7 +2,7 @@ var GLOBAL_LIST = null;
 fetchList();
 function setupScroll() {
     window.onscroll = function (ev) {
-        if (GLOBAL_LIST)
+        if (GLOBAL_LIST && GLOBAL_LIST['start']<GLOBAL_LIST['list'].length)
             if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight)) {
                 drawNewCards(10);
             }
