@@ -36,11 +36,7 @@ function fetchList(){
         url: atob(url),
         data : atob(payload),
         success: function(resp) {
-            $('#canvas_inner').html(
-                `
-                <div class="container"></div>
-                `
-            )
+            $('#canvas_inner').html(`<div class="container"></div>`);
             storeCache(resp);
             drawNewCards(15);
             setupScroll();
