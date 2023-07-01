@@ -9,8 +9,8 @@ function setupScroll() {
     };
 }
 function fetchList(){
-    const url = 'https://eastasia.azure.data.mongodb-api.com/app/luckycomment-vlqof/endpoint/lucky_list';
-    const payload = '{"api-key":"1ZbUoyuy74kR7SM5OI4mTmuZIqWarqGnHZH1Pb5woqgQqej8zvoosD2TVKbYBn2v"}';
+    const url = 'aHR0cHM6Ly9lYXN0YXNpYS5henVyZS5kYXRhLm1vbmdvZGItYXBpLmNvbS9hcHAvbHVja3ljb21tZW50LXZscW9mL2VuZHBvaW50L2x1Y2t5X2xpc3Q';
+    const payload = 'eyJhcGkta2V5IjoiMVpiVW95dXk3NGtSN1NNNU9JNG1UbXVaSXFXYXJxR25IWkgxUGI1d29xZ1FxZWo4enZvb3NEMlRWS2JZQm4ydiJ9';
     $.ajax({
         timeout: 10000,
         crossDomain: true,
@@ -18,8 +18,8 @@ function fetchList(){
         contentType: 'application/json',
         type: 'POST',
         origin: 'https://bgm.tv',
-        url: url,
-        data : payload,
+        url: atob(url),
+        data : atob(payload),
         success: function(resp) {
             for (var cmt of resp) {
                 addCard(cmt)
@@ -98,12 +98,12 @@ function cardTemplate(cmt) {
         <div class="poster">
         </div>`;
     const title = `
-        <div onClick="location.href='${sURL}';" class="subject_title">
+        <a href='${sURL}' target="_blank"  class="subject_title">
             <p class="subject_name" style="font-size:2em;">${cmt.sid}</p>
             <p class="subject_cname" style="font-size:1.2em; margin-top:5px;">-</p>
-        </div>`;
+        </a>`;
     const userInfo = `
-        <a class="user_name" href="${uURL}" style="font-size:1.2em;">${cmt.uid}</a>
+        <a class="user_name" href="${uURL}" target="_blank" style="font-size:1.2em;">${cmt.uid}</a>
         <br />
         <p>${cmt.date} ${buildStar(cmt.star)}</p>
     `;
