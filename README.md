@@ -1,6 +1,7 @@
 ## MILE STONES
  
 - [x] 超合金组件
+  - [ ] 历史记录
 - [x] 基于一次性token的点赞
 - [x] bgm feeling lucky website
   - [x] pinterest style layout
