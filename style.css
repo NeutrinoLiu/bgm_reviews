@@ -157,7 +157,7 @@ p {
     font-weight: 400;
 }
 
-footer {
+.footer {
     margin-top: 30px;
     margin-bottom: 30px;
     font-weight: 500;
@@ -165,7 +165,7 @@ footer {
     text-align: center;
 }
 
-footer a {
+.footer a {
     text-decoration: none !important;
     margin-top: 30px;
     margin-bottom: 30px;
