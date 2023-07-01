@@ -96,7 +96,7 @@ p {
 }
 
 .user_title {
-    margin:10px 15px 0px 15px;
+    margin:14px 15px 0px 15px;
     width:200px;
     white-space:nowrap;
     overflow:hidden;
@@ -107,7 +107,7 @@ p {
     color: rgb(70, 70, 70);
 }
 .user_title p {
-    margin: 4px 0 1px 0;
+    margin: 2px 0 1px 0;
     font-size:.9em;
     color: rgb(70, 70, 70);
     font-weight: 500;
