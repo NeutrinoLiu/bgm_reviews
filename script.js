@@ -6,7 +6,7 @@ function setupScroll() {
     window.onscroll = function (ev) {
         $('.dummy_bg').css('height', $('#canvas').height());
         if (GLOBAL_LIST && GLOBAL_LIST['start']<GLOBAL_LIST['list'].length)
-            if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight-20)) {
+            if ((window.innerHeight + window.scrollY) >= (document.getElementById('canvas').offsetHeight)) {
                 drawNewCards(10);
             }
     };
