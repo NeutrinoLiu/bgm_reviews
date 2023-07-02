@@ -43,9 +43,9 @@ body {
     font-size: 3em;
     font-family: 'Ubuntu', sans-serif;
     text-align: center;
-    font-weight: 300;
+    font-weight: 600;
     color: rgb(255, 255, 255);
-    text-shadow: 0 0 10px #a84c5d;
+    text-shadow: 0 0 20px #a43f5c7c;
     /* text-shadow: -1px -1px 1px #a2a1a1, 1px 1px 1px #fff; */
 }
 
@@ -74,7 +74,7 @@ p {
     backdrop-filter: blur(20px) contrast(95%);
     -webkit-backdrop-filter: blur(20px) contrast(95%);
     border: 1px solid #EEE;
-    background: rgba(254,254,254,0.6);
+    background: rgba(254,254,254,0.74);
 }
 
 .card {
@@ -181,19 +181,18 @@ p {
 .footer {
     margin-top: 30px;
     margin-bottom: 30px;
-    font-weight: 600;
-    color: rgb(104, 104, 104);
+    font-weight: 700;
+    color: rgb(255, 255, 255);
     text-align: center;
-    text-shadow: 0 0 4px #ffffff;
-    opacity: 0.6;
+    text-shadow: 0 0 5px #84384ed8;
 }
 
 .footer a {
     text-decoration: none !important;
     margin-top: 30px;
     margin-bottom: 30px;
-    font-weight: 600;
-    color: rgb(99, 99, 99);
+    font-weight: 700;
+    color: rgb(255, 255, 255);
     text-align: center;
 }
 
