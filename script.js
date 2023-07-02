@@ -9,6 +9,10 @@ function setupScroll() {
                 drawNewCards(10);
             }
     };
+    $('.dummy_bg').click(function(e){
+        console.log('canvas click');
+        $('.popup').fadeOut();
+    })
 }
 function storeCache(resp) {
     GLOBAL_LIST = {
@@ -66,15 +70,7 @@ function fetchList(){
 function addCard(cmt) {
     cmt.uid = cmt.uid.replace(/^\uFEFF/gm, "");
     $('.container').append(cardTemplate(cmt));
-    const likebtn =$(`#${cmt.id}`).find('.like_icon');
-    const likenumber=$(`#${cmt.id}`).find('.like_number');
-    likebtn.on( "click", function(){
-        if (likenumber.is(":hidden")) {
-            likenumber.fadeIn(300);
-        } else {
-            likenumber.fadeOut(300);
-        }
-    });
+    bindClick(cmt)
     resizeGridItem(cmt.id);
     updateMetaInfo(cmt);
 }
@@ -82,6 +78,31 @@ function addCard(cmt) {
 // --- global functions
 
 // --- util functions
+
+function bindClick(cmt) {
+    const date = new Date(cmt.time);
+    const timestamp = `最近喜欢: ${date.toLocaleTimeString()} ${date.toLocaleDateString()}
+                        <br/>总计喜欢: ${cmt.likes}
+                        `;
+    const myCard = $(`#${cmt.id}`)
+    const likebtn = myCard.find('.like_icon');
+    const likenumber = myCard.find('.like_number');
+    likebtn.on( "click", function(){
+        if (likenumber.is(":hidden")) {
+            likenumber.fadeIn(300);
+        } else {
+            likenumber.fadeOut(300);
+        }
+    });
+    myCard.find('.comment').click(function(e) {
+        // console.log(`click ${e.pageX} ${e.pageY}`);
+        $(".popup").hide();
+        $(".popup").css({left: e.pageX});
+        $(".popup").css({top: e.pageY});
+        $(".popup").find('p').html(timestamp);
+        $(".popup").fadeIn();
+      });
+}
 
 function updateMetaInfo(cmt) {
     const card = $(`#${cmt.id}`);
@@ -151,8 +172,6 @@ function updateMetaInfo(cmt) {
 function cardTemplate(cmt) {
     const uURL = "https://bgm.tv/user/" + cmt.uid;
     const sURL = 'https://bgm.tv/subject/' + cmt.sid;
-    const date = new Date(cmt.time);
-    const timestamp = '上一次点赞 ' + date.toLocaleTimeString() + ' ' + date.toLocaleDateString();
     function buildStar(nStar) {
         let half_star = '';
         if (nStar % 2) {
@@ -193,15 +212,12 @@ function cardTemplate(cmt) {
         </div>
     `
     const card = `
-        <div class="card" id=${cmt.id} title="${timestamp}">
+        <div class="card elegent" id=${cmt.id}>
             ${title}${poster}${comment_container}${like_icon}
         </div> 
         `;
     return card;
 }
-
-
-
 
 // --- dynamic grids
 function resizeGridItem(item_id){
