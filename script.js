@@ -11,7 +11,7 @@ function setupScroll() {
             }
     };
     $('.dummy_bg').click(function(e){
-        console.log('canvas click');
+        // console.log('canvas click');
         $('.popup').fadeOut();
     })
 }
