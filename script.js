@@ -108,6 +108,14 @@ function addCard(cmt) {
 
 // --- util functions
 
+function toast(e, msg) {
+    $(".popup").hide();
+    $(".popup").css({left: e.pageX});
+    $(".popup").css({top: e.pageY});
+    $(".popup").find('p').html(msg);
+    $(".popup").fadeIn();
+}
+
 function bindClick(cmt) {
     const date = new Date(cmt.time);
     const timestamp = `最近喜欢: ${date.toLocaleTimeString()} ${date.toLocaleDateString()}
@@ -125,11 +133,7 @@ function bindClick(cmt) {
     });
     myCard.find('.comment').click(function(e) {
         // console.log(`click ${e.pageX} ${e.pageY}`);
-        $(".popup").hide();
-        $(".popup").css({left: e.pageX});
-        $(".popup").css({top: e.pageY});
-        $(".popup").find('p').html(timestamp);
-        $(".popup").fadeIn();
+        toast(e, timestamp);
       });
 }
 
