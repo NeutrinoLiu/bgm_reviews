@@ -8,10 +8,49 @@
     margin: 0;
     padding: 0;
 }
-
+html {
+    scroll-behavior: smooth;
+}
 body {
     background-color: rgb(255, 255, 255);
 }
+
+hr.rounded {
+    width: 70%;
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border: none;
+    border-top: 2px solid #d9d9d9;
+    border-radius: 2px;
+}
+
+.side_panel {
+    flex-direction: column;
+    align-items: center; 
+    padding: 10px 0px 10px 0px;
+    text-align: center;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    position: fixed;
+    top: 45%;
+    right: 5%;
+    width: 50px;
+    z-index: 3;
+}
+
+.side_panel .side_btn {
+    cursor: pointer;
+    margin: 10px 0 5px 0;
+    opacity: 0.6;
+    transition: opacity .3s ease-in;
+}
+
+.side_panel .side_btn:hover {
+    opacity: 1.0;
+}
+
 
 .popup {
     -moz-border-radius: 8px;
@@ -50,11 +89,14 @@ body {
     position: relative;
 }
 .banner_span {
+    /* position: fixed; */
+    /* position: fixed; */
     margin: 0 5% 0 5%;
-    -moz-border-radius: 20px;
-    -webkit-border-radius: 20px;
-    border-radius: 20px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
     padding: 30px 20px 30px 20px;
+    z-index: 5;
 }
 
 .header {
@@ -131,7 +173,7 @@ p {
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
     border-radius: 8px;
-    z-index: 12;
+    z-index: 4;
     opacity: 0;
     margin: 10px 10px 10px 10px;
     position: relative;

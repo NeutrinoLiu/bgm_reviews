@@ -12,6 +12,28 @@ function resizeLoadingWrapper(){
     $('.aniWrapper').css('height', new_height);
 }
 fetchList();
+
+var SORT_PREF = 'time';
+function autorefill() {
+    refill(SORT_PREF);
+}
+
+function refill(sort) {
+    SORT_PREF = sort;
+    // replace canvas_inner content
+    window.scrollTo(0, 0);
+    $('#canvas_inner').html(
+`       <div class="aniWrapper">
+        <div class="wrapper">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div></div>`
+    )
+    resizeLoadingWrapper();
+    fetchList(sort);
+}
+
 function setupScroll() {
     $('.dummy_bg').css('height', $('#canvas').height());
     window.onscroll = function (ev) {
@@ -41,7 +63,7 @@ function drawNewCards(n) {
         GLOBAL_LIST['start'] += 1;
     }
 }
-function fetchList(){
+function fetchList(sort="time"){
     const url = 'aHR0cHM6Ly9lYXN0YXNpYS5henVyZS5kYXRhLm1vbmdvZGItYXBpLmNvbS9hcHAvbHVja3ljb21tZW50LXZscW9mL2VuZHBvaW50L2x1Y2t5X2xpc3Q';
     const payload = 'eyJhcGkta2V5IjoiMVpiVW95dXk3NGtSN1NNNU9JNG1UbXVaSXFXYXJxR25IWkgxUGI1d29xZ1FxZWo4enZvb3NEMlRWS2JZQm4ydiJ9';
     let ajax_req = {
@@ -54,7 +76,7 @@ function fetchList(){
         contentType: 'application/json',
         type: 'POST',
         origin: 'https://bgm.tv',
-        url: atob(url),
+        url: atob(url) + "?sort=" + sort,
         data : atob(payload),
         success: function(resp) {
             $('#canvas_inner').html(`<div class="container"></div>`);
