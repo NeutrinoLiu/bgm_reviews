@@ -6,13 +6,14 @@ function resizeLoadingWrapper(){
     const inner_height = window.innerHeight;
     const header_height = document.getElementById('myheader').offsetHeight;
     const footer_height = document.getElementById('myfooter').offsetHeight;
-    console.log(`${inner_height} ${header_height} ${footer_height}`);
+    // console.log(`${inner_height} ${header_height} ${footer_height}`);
     const min = 200;
     const new_height = Math.max(inner_height - header_height - footer_height - 40, min)
     $('.aniWrapper').css('height', new_height);
 }
 fetchList();
 function setupScroll() {
+    $('.dummy_bg').css('height', $('#canvas').height());
     window.onscroll = function (ev) {
         $('.dummy_bg').css('height', $('#canvas').height());
         if (GLOBAL_LIST && GLOBAL_LIST['start']<GLOBAL_LIST['list'].length)
