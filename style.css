@@ -43,7 +43,7 @@ hr.rounded {
 .side_panel .side_btn {
     cursor: pointer;
     margin: 10px 0 5px 0;
-    opacity: 0.6;
+    opacity: 0.5;
     transition: opacity .3s ease-in;
 }
 
@@ -71,31 +71,31 @@ hr.rounded {
 }
 
 .dummy_bg {
-    position: absolute;
+    position: fixed;
+    height: 100%;
     width: 100%;
     z-index: 1;
-}
-
-#header_canvas_footer {
     background-image:  url('bg.png');
     background-attachment: fixed;
 }
 
 #canvas_inner {
-    margin-top: 20px;
-    margin-bottom: 20px;
+    /* margin-top: 20px; */
+    /* margin-bottom: 20px; */
+    padding-top: 110px;
     padding-left: 10%;
     padding-right: 10%;
+    padding-bottom: 130px;
     position: relative;
 }
 .banner_span {
-    /* position: fixed; */
-    /* position: fixed; */
+    position: fixed;
+    width: 90%;
     margin: 0 5% 0 5%;
     -moz-border-radius: 15px;
     -webkit-border-radius: 15px;
     border-radius: 15px;
-    padding: 30px 20px 30px 20px;
+    padding: 20px;
     z-index: 5;
 }
 
@@ -119,6 +119,7 @@ hr.rounded {
 }
 
 .footer {
+    bottom: 0;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     -moz-border-bottom-left-radius: 0 !important;
@@ -281,11 +282,7 @@ p {
     font-weight: 400;
 }
 
-/* animate */
-.aniWrapper {
-    width: auto;
-}
-.wrapper{
+.loading_wrapper{
     top: 40%;
     width: 200px;
     position: relative;

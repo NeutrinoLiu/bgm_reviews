@@ -1,16 +1,6 @@
 var GLOBAL_LIST = null;
 const RETRY = 3;
 const RETRY_INTERVAL = 2000;
-resizeLoadingWrapper();
-function resizeLoadingWrapper(){
-    const inner_height = window.innerHeight;
-    const header_height = document.getElementById('myheader').offsetHeight;
-    const footer_height = document.getElementById('myfooter').offsetHeight;
-    // console.log(`${inner_height} ${header_height} ${footer_height}`);
-    const min = 200;
-    const new_height = Math.max(inner_height - header_height - footer_height - 40, min)
-    $('.aniWrapper').css('height', new_height);
-}
 fetchList();
 
 var SORT_PREF = 'time';
@@ -18,26 +8,30 @@ function autorefill() {
     refill(SORT_PREF);
 }
 
+function deleteLoading(){
+    $('.dummy_bg').html('');
+}
+function addLoading(){
+    $('.dummy_bg').html(`
+        <div class="loading_wrapper">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>`
+    )
+}
+
 function refill(sort) {
     SORT_PREF = sort;
+    $('#canvas_inner').html('');
+    addLoading();
     // replace canvas_inner content
     window.scrollTo(0, 0);
-    $('#canvas_inner').html(
-`       <div class="aniWrapper">
-        <div class="wrapper">
-            <div class="circle"></div>
-            <div class="circle"></div>
-            <div class="circle"></div>
-        </div></div>`
-    )
-    resizeLoadingWrapper();
     fetchList(sort);
 }
 
 function setupScroll() {
-    $('.dummy_bg').css('height', $('#canvas').height());
     window.onscroll = function (ev) {
-        $('.dummy_bg').css('height', $('#canvas').height());
         if (GLOBAL_LIST && GLOBAL_LIST['start']<GLOBAL_LIST['list'].length)
             if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - document.getElementById('myfooter').offsetHeight)) {
                 drawNewCards(10);
@@ -49,6 +43,7 @@ function setupScroll() {
     })
 }
 function storeCache(resp) {
+    deleteLoading();
     GLOBAL_LIST = {
         'start' : 0,
         'list' : resp
@@ -246,7 +241,7 @@ function cardTemplate(cmt) {
         </div>
     `
     const card = `
-        <div class="card elegent" id=${cmt.id}>
+        <div class="card elegent hoverclass" id=${cmt.id}>
             ${title}${poster}${comment_container}${like_icon}
         </div> 
         `;
