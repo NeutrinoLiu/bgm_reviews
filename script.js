@@ -1,9 +1,14 @@
 var GLOBAL_LIST = null;
+var SORT_PREF = 'time';
+var LAST_SCROLL_TOP = 0;
+
 const RETRY = 3;
 const RETRY_INTERVAL = 2000;
-fetchList();
 
-var SORT_PREF = 'time';
+setupScroll();
+refill('times');
+
+
 function autorefill() {
     refill(SORT_PREF);
 }
@@ -28,6 +33,9 @@ function refill(sort) {
     // replace canvas_inner content
     window.scrollTo(0, 0);
     fetchList(sort);
+    $('#canvas_inner').css('padding-top', $('#myheader').height() + 60);
+    $('#canvas_inner').css('padding-bottom', $('#myfooter').height() + 60);
+    // console.log(`${$('#myheader').height()} ${$('#myheader').height()}`);
 }
 
 function setupScroll() {
@@ -36,12 +44,22 @@ function setupScroll() {
             if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - document.getElementById('myfooter').offsetHeight)) {
                 drawNewCards(10);
             }
+        let st = $(this).scrollTop();
+            if (st > LAST_SCROLL_TOP){
+                $('#myheader').slideUp();
+                $('#myfooter').slideDown();
+            } else {
+                $('#myfooter').slideUp();
+                $('#myheader').slideDown();
+            }
+            LAST_SCROLL_TOP = st;
     };
     $('.dummy_bg').click(function(e){
         // console.log('canvas click');
         $('.popup').fadeOut();
     })
 }
+
 function storeCache(resp) {
     deleteLoading();
     GLOBAL_LIST = {
@@ -77,7 +95,6 @@ function fetchList(sort="time"){
             $('#canvas_inner').html(`<div class="container"></div>`);
             storeCache(resp);
             drawNewCards(15);
-            setupScroll();
         },
         error: function(resp) {
             ajax_req.tryCount++;
