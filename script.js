@@ -6,7 +6,7 @@ const RETRY = 3;
 const RETRY_INTERVAL = 2000;
 
 setupScroll();
-refill('times');
+refill('time');
 
 
 function autorefill() {
