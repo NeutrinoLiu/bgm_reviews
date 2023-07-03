@@ -67,11 +67,11 @@ body {
 }
 
 .header h1 {
-    color: #525252;
+    color: #4f4f4f;
     /* color: #717171; */
-    text-shadow: 1px 1px 0px #ffffff;
+    text-shadow: 1px 1px 0px #fff;
     font-size: 2em;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: 'Bitter', serif;
     text-align: center;
     font-weight: 700;
 }
@@ -87,15 +87,15 @@ body {
 
 .footer p {
     color: #525252;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: 'Bitter', serif;
     font-size: 1em;
     line-height: 1.3;
-    font-weight: 300;
+    font-weight: 600;
     text-align: center;
 }
 
 .footer a {
-    font-family: 'Ubuntu', sans-serif;
+    font-family: inherit;
     color: inherit;
     text-decoration: none !important;
     font-weight: inherit;
