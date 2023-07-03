@@ -13,6 +13,8 @@ html {
 }
 body {
     background-color: rgb(255, 255, 255);
+    background-image:  url('bg.png');
+    background-attachment: fixed;
 }
 
 hr.rounded {
@@ -75,8 +77,6 @@ hr.rounded {
     height: 100%;
     width: 100%;
     z-index: 1;
-    background-image:  url('bg.png');
-    background-attachment: fixed;
 }
 
 #canvas_inner {
