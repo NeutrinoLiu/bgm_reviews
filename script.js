@@ -44,15 +44,15 @@ function setupScroll() {
             if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - document.getElementById('myfooter').offsetHeight)) {
                 drawNewCards(10);
             }
-        let st = $(this).scrollTop();
-            if (st > LAST_SCROLL_TOP){
-                $('#myheader').slideUp();
-                $('#myfooter').slideDown();
-            } else {
-                $('#myfooter').slideUp();
-                $('#myheader').slideDown();
-            }
-            LAST_SCROLL_TOP = st;
+        // let st = $(this).scrollTop();
+        //     if (st > LAST_SCROLL_TOP){
+        //         $('#myfooter').slideUp();
+        //         $('#myheader').slideDown();
+        //     } else {
+        //         $('#myheader').slideUp();
+        //         $('#myfooter').slideDown();
+        //     }
+        //     LAST_SCROLL_TOP = st;
     };
     $('.dummy_bg').click(function(e){
         // console.log('canvas click');

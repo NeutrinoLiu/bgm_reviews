@@ -36,10 +36,11 @@ hr.rounded {
     -webkit-border-radius: 15px;
     border-radius: 15px;
     position: fixed;
-    top: 45%;
+    top: 30%;
+    vertical-align: middle;
     right: 5%;
     width: 50px;
-    z-index: 3;
+    z-index: 6;
 }
 
 .side_panel .side_btn {
