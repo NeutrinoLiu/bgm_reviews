@@ -33,8 +33,8 @@ function refill(sort) {
     // replace canvas_inner content
     window.scrollTo(0, 0);
     fetchList(sort);
-    $('#canvas_inner').css('padding-top', $('#myheader').height() + 60);
-    $('#canvas_inner').css('padding-bottom', $('#myfooter').height() + 60);
+    // $('#canvas_inner').css('padding-top', $('#myheader').height() + 50);
+    // $('#canvas_inner').css('padding-bottom', $('#myfooter').height() + 50);
     // console.log(`${$('#myheader').height()} ${$('#myheader').height()}`);
 }
 
@@ -126,32 +126,39 @@ function addCard(cmt) {
 // --- util functions
 
 function toast(e, msg) {
-    $(".popup").hide();
-    $(".popup").css({left: e.pageX});
-    $(".popup").css({top: e.pageY});
-    $(".popup").find('p').html(msg);
-    $(".popup").fadeIn();
+    const ppup = $(".popup");
+    if (ppup.is(':visible') && msg === ppup.find('p').html()) {
+        // console.log('same info');
+        ppup.fadeOut();
+    } else {
+        ppup.hide();
+        ppup.css({right:  $(window).width() - e.pageX});
+        ppup.css({top: e.pageY});
+        ppup.find('p').html(msg);
+        ppup.fadeIn();
+    }
 }
 
 function bindClick(cmt) {
     const date = new Date(cmt.time);
     const timestamp = `最近喜欢: ${date.toLocaleTimeString()} ${date.toLocaleDateString()}
-                        <br/>总计喜欢: ${cmt.likes}
+                        <br>总计喜欢: ${cmt.likes}
                         `;
     const myCard = $(`#${cmt.id}`)
     const likebtn = myCard.find('.like_icon');
-    const likenumber = myCard.find('.like_number');
-    likebtn.on( "click", function(){
-        if (likenumber.is(":hidden")) {
-            likenumber.fadeIn(300);
-        } else {
-            likenumber.fadeOut(300);
-        }
-    });
-    myCard.find('.comment').click(function(e) {
-        // console.log(`click ${e.pageX} ${e.pageY}`);
+    // const likenumber = myCard.find('.like_number');
+    likebtn.on( "click", function(e){
         toast(e, timestamp);
-      });
+        // if (likenumber.is(":hidden")) {
+        //     likenumber.fadeIn(300);
+        // } else {
+        //     likenumber.fadeOut(300);
+        // }
+    });
+    // myCard.find('.comment').click(function(e) {
+    //     // console.log(`click ${e.pageX} ${e.pageY}`);
+    //     toast(e, timestamp);
+    //   });
 }
 
 function updateMetaInfo(cmt) {
