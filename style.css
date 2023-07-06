@@ -12,9 +12,12 @@ html {
     scroll-behavior: smooth;
 }
 body {
-    background-color: rgb(255, 255, 255);
-    background-image:  url('bg.png');
+    /* background-color: rgb(255, 226, 226); */
+    background: linear-gradient(90deg, #ee9ca7 0%, #ffdde1 100%);
+    /* background-image:  url('bg.png'); */
     background-attachment: fixed;
+    background-image: url("clean-textile.png"), linear-gradient(90deg, #ee9ca7 0%, #ffdde1 100%);
+
 }
 
 hr.rounded {
