@@ -139,10 +139,27 @@ function toast(e, msg) {
     }
 }
 
+function relativeTime(date) {
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+
+    var elapsed = new Date() - date;
+
+    if (elapsed < msPerMinute) 
+         return '刚刚';   
+    else if (elapsed < msPerHour) 
+         return Math.round(elapsed/msPerMinute) + '分钟前';   
+    else if (elapsed < msPerDay ) 
+         return Math.round(elapsed/msPerHour ) + '小时前';   
+    else return `${date.toLocaleDateString('zh-Hans-CN')}`
+}
+
+
 function bindClick(cmt) {
     const date = new Date(cmt.time);
-    const timestamp = `最近喜欢: ${date.toLocaleTimeString()} ${date.toLocaleDateString()}
-                        <br>总计喜欢: ${cmt.likes}
+    const timestamp = `最近一次点赞: ${relativeTime(date)}
+                        <br>总计收到点赞: ${cmt.likes}
                         `;
     const myCard = $(`#${cmt.id}`)
     const likebtn = myCard.find('.like_icon');
