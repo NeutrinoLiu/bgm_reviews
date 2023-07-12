@@ -114,7 +114,7 @@ function fetchList(sort="time"){
 
 }
 function addCard(cmt) {
-    cmt.uid = cmt.uid.replace(/^\uFEFF/gm, "");
+    cmt.uid = cmt.uid.replace(/[\uFEFF\u00EF\u00BB\u00BF]/g,'');
     $('.container').append(cardTemplate(cmt));
     bindClick(cmt)
     resizeGridItem(cmt.id);
