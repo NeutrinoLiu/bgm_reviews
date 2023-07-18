@@ -77,20 +77,18 @@ function drawNewCards(n) {
     }
 }
 function fetchList(sort="time"){
-    const url = 'aHR0cHM6Ly9lYXN0YXNpYS5henVyZS5kYXRhLm1vbmdvZGItYXBpLmNvbS9hcHAvbHVja3ljb21tZW50LXZscW9mL2VuZHBvaW50L2x1Y2t5X2xpc3Q';
-    const payload = 'eyJhcGkta2V5IjoiMVpiVW95dXk3NGtSN1NNNU9JNG1UbXVaSXFXYXJxR25IWkgxUGI1d29xZ1FxZWo4enZvb3NEMlRWS2JZQm4ydiJ9';
+    // deprecated lucky
+    const url_lucky = 'https://eastasia.azure.data.mongodb-api.com/app/luckycomment-vlqof/endpoint/lucky_list';
+    const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes';
     let ajax_req = {
         tryCount: 0,
         retryLimit: RETRY,
         retryInterval: RETRY_INTERVAL,
         timeout: 10000,
         crossDomain: true,
-        dataType: 'json',
         contentType: 'application/json',
-        type: 'POST',
-        origin: 'https://bgm.tv',
-        url: atob(url) + "?sort=" + sort,
-        data : atob(payload),
+        type: 'GET',
+        url: url_reviews + "?sort=" + sort,
         success: function(resp) {
             $('#canvas_inner').html(`<div class="container"></div>`);
             storeCache(resp);
@@ -111,7 +109,6 @@ function fetchList(sort="time"){
         }
     };
     $.ajax(ajax_req);
-
 }
 function addCard(cmt) {
     cmt.uid = cmt.uid.replace(/[\uFEFF\u00EF\u00BB\u00BF]/g,'');

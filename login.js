@@ -1,26 +1,306 @@
-//console.log('works');
-
-const LUCKY_LOGIN_KEY = "LUCKY_LOGIN";
-var LOGIN_TOKEN_TICKET = null;
-addLoginPanel();
-addStyle();
-
 function addStyle() {
     const style = document.createElement('style');
     style.innerHTML = `
+    :target {
+        animation: target-fade 1s;
+    }
+    @keyframes target-fade {
+        from { background-color: red; } 
+        to { background-color: transparent; }
+    }
+    .lucky_popup {
+        -moz-border-radius: 8px;
+        -webkit-border-radius: 8px;
+        border-radius: 8px;
+        -moz-box-shadow: inset 0 1px 1px hsla(0, 0%, 100%, 0.3), inset 0 -1px 0 hsla(0, 0%, 100%, 0.1), 0 2px 4px hsla(0, 0%, 0%, 0.2);
+        -webkit-box-shadow: inset 0 1px 1px hsla(0, 0%, 100%, 0.3), inset 0 -1px 0 hsla(0, 0%, 100%, 0.1), 0 2px 4px hsla(0, 0%, 0%, 0.2);
+        box-shadow: inset 0 1px 1px hsla(0, 0%, 100%, 0.3), inset 0 -1px 0 hsla(0, 0%, 100%, 0.1), 0 2px 4px hsla(0, 0%, 0%, 0.2);
+        backdrop-filter: blur(20px) contrast(95%);
+        -webkit-backdrop-filter: blur(20px) contrast(95%);
+        z-index: 10;
+        display: none;
+        position: absolute;
+        text-align: left;
+        border: 1px solid #d8d8d8;
+        background: rgba(255, 255, 255, 0.7);
+        cursor: default;
+        transition: background 0.5s ease;
+    }
+    .lucky_popup:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    html[data-theme='dark'] .lucky_popup {
+        border: 1px solid #474747;
+        background: rgba(50,50,50,0.8);
+    }
+    html[data-theme='dark'] .lucky_popup:hover {
+        background: rgba(50,50,50,0.1);
+    }
+    .lucky_popup_inner {
+        display: table;
+        padding: 2px;
+     }
+    .lucky_popup_icon {
+        display: table-cell;
+        vertical-align: middle;
+        padding: 5px 5px 0px 5px;
+    }
+    .lucky_popup svg {
+        cursor: pointer;
+    }
+    .lucky_popup svg path {
+        fill: #666666;
+    }
+    html[data-theme='dark'] .lucky_popup svg path {
+        fill: #d8d8d8;
+    }
+    .lucky_popup p {
+        padding: 2px 6px 0px 0px;
+        display: table-cell;
+        vertical-align: middle;
+        font-size: 1em;
+        font-weight: 500;
+        color: #666666;
+    }
+    html[data-theme='dark'] .lucky_popup p {
+        color: #d8d8d8;
+    }
+    #like_beating {
+        animation: heartbeat 1s linear;
+    }
+    @keyframes heartbeat
+    {
+      0%
+      {
+        transform: scale( 1. );
+      }
+      50%
+      {
+        transform: scale( 1.2 );
+      }
+      100%
+      {
+        transform: scale( 1. );
+      }
+    }
     `;
     document.head.appendChild(style);
 }
+addStyle();
 
-function addLogoutBtn(login_info) {
-    const logout_btn_raw = '<a id="lucky_logout" class="btnBlueSmall" style="color: #FFF; cursor:pointer;">取消授权</a>';
-    const logout_prompt = `授权状态: ${login_info.uname} 已授权 ${logout_btn_raw}`;
-    $('#lucky_login_status').html(logout_prompt);
-    $('#lucky_logout').on('click', function(){
-        localStorage.removeItem(LUCKY_LOGIN_KEY);
-        console.log('[bgm_luck] previous token has been removed');
-        addLoginBtn();
+// comment likes function related ==============================
+
+const LIKE_HOLLOW = `
+    <svg xmlns="http://www.w3.org/2000/svg" height="1.7em" viewBox="-20 -20 550 550">
+    <path d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8v-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5v3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20c0 0-.1-.1-.1-.1c0 0 0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5v3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2v-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z"/>
+    </svg>`;
+const LIKE_FILLED = `
+    <svg xmlns="http://www.w3.org/2000/svg" height="1.7em" viewBox="-20 -20 550 550" id=like_beating>
+    <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+    </svg>`;
+hookPopup();
+
+
+function hookPopup() {
+    // ** utils **
+    const get_sid_from_url = function() {
+        return location.pathname.split('subject/')[1].split('/')[0];
+    }
+    const get_uid_from_url = function() {
+        return location.pathname.split('list/')[1].split('/')[0];
+    }
+    const date_digest = function (ts) {
+        if (ts.includes('ago'))
+            return new Date().toLocaleDateString("zh-Hans-CN");
+        else return ts.replace('@ ', '').split(' ')[0]
+    }
+    const get_star = function (ele) {
+        if (ele.length)
+            return Number(ele.attr('class').split(' ')[1].replace('stars',''));
+        else return 0;
+    }
+    const trimSpace = function (ele) {
+        if (! ele) return ele;
+        return ele.replaceAll('\n', ' ').replaceAll('\t', ' ').trimStart();
+    }
+    //
+    const cbox_selector = function(ele) {
+        return $(ele).find('p');
+    }
+    const ucont_selector = function(ele) {
+        return $(ele);
+    }
+    const blist_selector = function(ele) {
+        return $(ele).find('div.text');
+    }
+    const cbox_parser = function(ele) {
+        const ret = {
+            uid: $(ele).find('a').attr('href').split('/').slice(-1)[0],
+            sid: get_sid_from_url(),
+            date: date_digest($(ele).find('small.grey').text()),
+            stars: get_star($(ele).find('.starlight')),
+            content: trimSpace($(ele).find('p').text())
+        }
+        return ret;
+    }
+    const ucont_parser = function(ele) {
+        const ret = {
+            uid: $(ele).find('a').attr('href').split('/').slice(-1)[0],
+            sid: get_sid_from_url(),
+            date: date_digest($(ele).find('p.info').text()),
+            stars: get_star($(ele).find('.starlight')),
+            content: trimSpace($(ele).html().split('</p>')[1].split('</div>')[0])
+        }
+        return ret;
+    }
+    const blist_parser = function(ele) {
+        const ret = {
+            uid: get_uid_from_url(),
+            sid: $(ele).find('a').attr('href').split('/').slice(-1)[0],
+            date: $(ele).find('span.tip_j').text(),
+            stars: get_star($(ele).find('.starlight')),
+            content: trimSpace($(ele).find('div.text').text())
+        }
+        return ret;
+    }
+
+    const popup_raw = `
+    <div class="lucky_popup">
+        <div class="lucky_popup_inner">
+            <div class="lucky_popup_icon">${LIKE_HOLLOW}</div>
+            <p hidden></p>
+        </div></div>`;
+    $('.mainWrapper').append(popup_raw);
+
+    const mpopup = $('.lucky_popup');
+
+    const ucont = $('#memberUserList'); // collections 页面
+    if (ucont.length) bindComments(mpopup, ucont.find('div.userContainer'), ucont_selector, ucont_parser);
+
+    const blist = $('div.mainWrapper').find('#browserItemList'); // 用户收藏页
+    if (blist.length) bindComments(mpopup, blist.find('li.item'), blist_selector, blist_parser);
+
+    const cbox = $('#columnSubjectHomeB').find('#comment_box');    // 吐槽箱
+    if (cbox.length) bindComments(mpopup, cbox.find('div.text'), cbox_selector, cbox_parser);
+}
+
+function getIdentity() {
+    return JSON.parse(localStorage.getItem(LUCKY_LOGIN_KEY));
+}
+
+function send_like(cmt, ppup) {
+    const id_token = getIdentity();
+    if (! id_token) {
+        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        ppup.find('p').html(`<a href="https://${location.host}/#lucky_login_panel">请先在主页授权</a>`);
+        ppup.find('p').fadeIn();
+    } else {
+        const post_data = {
+            liker: id_token.uid,
+            token: id_token.token,
+            detail: cmt.info,
+        }
+        // console.log(post_data);
+        $.ajax({
+            timeout: 5000,
+            type:'POST',
+            crossDomain: true,
+            contentType: 'application/json',
+            url: 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/like_reivew',
+            dataType: 'json',
+            data: JSON.stringify(post_data),
+            success : function(resp) {
+                cmt.status.liked = resp.like_succeed >= 0;
+                cmt.status.likers = resp.likers;
+                cmt.status.nlikers = resp.nlikers;
+                show_status(cmt, ppup, resp.like_succeed == 0);
+            },
+            error : function() {
+                console.warn('[bgm_luck] like fails');
+                ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+                ppup.find('p').html('点赞失败');
+                ppup.find('p').fadeIn();
+            }
+        });
+    }
+}
+
+function show_status(cmt, ppup, duplicate=false) {
+    const cmt_href = cmt.status.likers.slice(0,5).map(function(liker){
+        return `<a href="/user/${liker}" target="_blank">${liker}</a>`;
     });
+    if (duplicate) {
+        ppup.find('p').html(`该短评已经点赞`);
+        ppup.find('p').fadeIn();
+        setTimeout(function(){
+            ppup.find('p').hide();
+            ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位班友喜欢了该短评`);
+            ppup.find('p').fadeIn();
+        }, 1500);
+    } else {
+        ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位班友喜欢了该短评`);
+        ppup.find('p').fadeIn();
+    }
+}
+
+function ppupRefill(cmt, ppup) {
+    ppup.unbind();
+    if (cmt.status.liked) {
+        ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
+        show_status(cmt, ppup);
+    } else {
+        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        ppup.find('p').html('');
+        ppup.find('p').hide();
+        ppup.on('click', function(){
+            ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
+            ppup.unbind()
+            send_like(cmt, ppup);
+        });
+    }
+}
+
+function bindComments(ppup, list, selector, parser) {
+    list.each( function() {
+        const ele = this;
+        ele.info = parser(ele);
+        let clickable = selector(ele);
+        if (clickable.length && ele.info.content && ele.info.content != '') {
+            ele.status = {
+                liked: false,
+                likers: [],
+                nlikers: -1,
+            };
+            clickable.css('cursor', 'pointer');
+            clickable.on('click', function (e) {
+                if (ppup.last_time_click == ele) {
+                    ppup.fadeOut();
+                    ppup.last_time_click = null;
+                } else {
+                    ppup.hide()
+                    ppupRefill(ele, ppup);
+                    ppup.css({left: e.pageX-20});
+                    ppup.css({top: e.pageY-40});
+                    ppup.fadeIn();
+                    ppup.last_time_click = ele;
+                }
+            });
+        }
+    });
+}
+
+// log-in related logic =============================
+
+const LUCKY_LOGIN_KEY = "BGM_LUCKY_LOGIN";
+const LOGIN_APPKEY = 'eyJhcGkta2V5IjoiTmdxTTZSaWowQ1o3aEJuaUhKZGd5ZGNxU0tVRE1VU2w2YmhIY2lDWG84cmszOVBoUGtMOFZya3BFa1pxRGtVbSJ9';
+var LOGIN_TOKEN_TICKET = null;
+addLoginPanel();
+
+function getUid() {
+    const user = $('.idBadgerNeue').find('a.avatar');
+    let uid = user.attr('href').split('/');
+    uid = uid[uid.length -1];
+    return uid;
 }
 
 function disable_btn(btn, prompt) {
@@ -69,11 +349,15 @@ function addLoginPanel() {
     }
 }
 
-function getUid() {
-    const user = $('.idBadgerNeue').find('a.avatar');
-    let uid = user.attr('href').split('/');
-    uid = uid[uid.length -1];
-    return uid;
+function addLogoutBtn(login_info) {
+    const logout_btn_raw = '<a id="lucky_logout" class="btnBlueSmall" style="color: #FFF; cursor:pointer;">取消授权</a>';
+    const logout_prompt = `授权状态: ${login_info.uname} 已授权 ${logout_btn_raw}`;
+    $('#lucky_login_status').html(logout_prompt);
+    $('#lucky_logout').on('click', function(){
+        localStorage.removeItem(LUCKY_LOGIN_KEY);
+        console.log('[bgm_luck] previous token has been removed');
+        addLoginBtn();
+    });
 }
 
 function addLoginBtn() {
@@ -116,7 +400,7 @@ function addLoginBtn() {
             contentType: 'application/json',
             url: 'https://eastasia.azure.data.mongodb-api.com/app/bgm_oauth_login-temed/endpoint/create_token' + paras,
             dataType: 'json',
-            data: '{"api-key":"NgqM6Rij0CZ7hBniHJdgydcqSKUDMUSl6bhHciCXo8rk39PhPkL8VrkpEkZqDkUm"}',
+            data: atob(LOGIN_APPKEY),
             success : callback_create,
             error : function() {
                 console.warn('[bgm_luck] fail to ask for oauth page');
@@ -137,7 +421,7 @@ function addLoginBtn() {
                 contentType: 'application/json',
                 url: 'https://eastasia.azure.data.mongodb-api.com/app/bgm_oauth_login-temed/endpoint/get_token' + paras,
                 dataType: 'json',
-                data: '{"api-key":"NgqM6Rij0CZ7hBniHJdgydcqSKUDMUSl6bhHciCXo8rk39PhPkL8VrkpEkZqDkUm"}',
+                data: atob(LOGIN_APPKEY),
                 success : callback_dump,
                 error : function() {
                     console.warn('[bgm_luck] invalid ticket for fetching token');
