@@ -325,8 +325,6 @@ function addLoginPanel() {
             <h2 class="subtitle" style="cursor:pointer;">Feeling Lucky 设置</h2>
             <ul class="timeline" style="margin: 0px 5px; display: block;">
                 <li id="lucky_login_status"></li>
-                <li>短评盲盒范围: all</li>
-                <li>每日popup: True</li>
             </ul>
         </div></div>
     `;
