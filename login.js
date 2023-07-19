@@ -1,12 +1,6 @@
 function addStyle() {
     const style = document.createElement('style');
     style.innerHTML = `
-    div.larger_quote {
-        margin: 5px 0;
-        max-width: 550px;
-        font-size: 12px;
-        color: #666;
-    }
     :target {
         animation: target-fade 1s;
     }
@@ -571,7 +565,7 @@ function refillTmlItems(records) {
             uid: r.uid,
             sid: r.sid
         }
-        let clickable = li_ele.find('div.larger_quote');
+        let clickable = li_ele.find('div.quote');
         if (clickable.length) {
             li_ele.status = {
                 liked: false,
@@ -610,7 +604,7 @@ function buildTmlItems(records) {
             const liker_name = `${r.likes} 位bgmer`
             const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
             const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
-            const collect_info = `<div class="collectInfo"><div class="larger_quote"><q>${r.comment}</q></div></div>`
+            const collect_info = `<div class="collectInfo"><div class="quote"><q>${r.comment}</q></div></div>`
             const time_stamp = `<p class="date">${relativeTime(Date.parse(r.time))}</p>`
 
             const span_info = `<span class="info clearit" >${span_subject}${liker_name}喜欢了 ${likee_name} 对 ${subject_name} 的短评: ${collect_info} ${time_stamp}</span>`
