@@ -182,6 +182,11 @@ function hookPopup() {
 
     const cbox = $('#columnSubjectHomeB').find('#comment_box');    // 吐槽箱
     if (cbox.length) bindComments(mpopup, cbox.find('div.text'), cbox_selector, cbox_parser);
+
+    const cbox_2 = $('#columnInSubjectA').find('#comment_box');    // 吐槽箱
+    if (cbox_2.length) bindComments(mpopup, cbox_2.find('div.text'), cbox_selector, cbox_parser);
+
+
 }
 
 function getIdentity() {
@@ -471,7 +476,7 @@ function addLoginBtn() {
 // add new timeline ===================
 addTimelineReview();
 function addTimelineReview() {
-    const review_tl_raw = '<li><a id="tab_lucky_review" href="javascript:;">短评</a></li>'
+    const review_tl_raw = '<li><a id="tab_lucky_review" href="javascript:;">短评时间线</a></li>'
     $('#timelineTabs > li:nth-child(2)').after(review_tl_raw);
     const tab_review_btn = $('#tab_lucky_review');
     tab_review_btn.css('cursor', 'pointer');
