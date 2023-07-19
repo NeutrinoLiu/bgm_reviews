@@ -170,7 +170,7 @@ function hookPopup() {
             <div class="lucky_popup_icon">${LIKE_HOLLOW}</div>
             <p hidden></p>
         </div></div>`;
-    $('.mainWrapper').append(popup_raw);
+    $('body.bangumi').append(popup_raw);
 
     const mpopup = $('.lucky_popup');
 
@@ -237,11 +237,11 @@ function show_status(cmt, ppup, duplicate=false) {
         ppup.find('p').fadeIn();
         ppup.timeout = setTimeout(function(){
             ppup.find('p').hide();
-            ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位班友喜欢了该短评`);
+            ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
             ppup.find('p').fadeIn();
         }, 1000);
     } else {
-        ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位班友喜欢了该短评`);
+        ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
         ppup.find('p').fadeIn();
     }
 }
@@ -461,3 +461,165 @@ function addLoginBtn() {
     });
 }
 
+// add new timeline ===================
+addTimelineReview();
+function addTimelineReview() {
+    const review_tl_raw = '<li><a id="tab_lucky_review" href="javascript:;">短评</a></li>'
+    $('#timelineTabs > li:nth-child(2)').after(review_tl_raw);
+    const tab_review_btn = $('#tab_lucky_review');
+    tab_review_btn.css('cursor', 'pointer');
+    tab_review_btn.on('click', showReviewTimeline);
+}
+
+function showReviewTimeline(){
+    const tab_review_btn = $('#tab_lucky_review');
+    const tml_content = $('#tmlContent');
+    $('#timelineTabs').find('a').each(
+        function (){
+            const cls = $(this).attr('class');
+            if (cls) $(this).attr('class', cls.replace('focus',''));
+        });
+    tab_review_btn.attr('class', 'focus');
+    tml_content.html('<div class="loading"><img src="/img/loadingAnimation.gif"></div>');
+
+    const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time&n=10';
+    let ajax_req = {
+        timeout: 10000,
+        crossDomain: true,
+        contentType: 'application/json',
+        type: 'GET',
+        url: url_reviews,
+        success: function(resp) {
+            tml_content.html(`
+            <div id="timeline">
+                <h4 class="Header">
+                <a id="refresh_header">刷新</a> | 
+                <a href="https://neutrinoliu.github.io/bgm_reviews/" target="_blank">Feeling Lucky Waterfall</a>
+                </h4>
+                <ul>${buildTmlItems(resp)}</ul>
+            </div>`)
+            tml_content.find('#refresh_header').on('click', showReviewTimeline);
+            tml_content.find('#refresh_header').css('cursor', 'pointer');
+            refillTmlItems(resp);
+        },
+        error: function() {
+            tml_content.html('<div class="loading"><h2>服务器正在ICU抢救中 ... </h2></div>')
+        }
+    };
+    $.ajax(ajax_req);
+}
+
+function refillTmlItems(records) {
+    const ppup = $('.lucky_popup');
+    records.forEach(function (r){
+        // console.log(r);
+        const li_ele = $(`#${r.id}`);
+        $.ajax({
+            timeout: 2000,
+            contentType: 'application/json',
+            type: 'GET',
+            url: `https://api.bgm.tv/v0/users/${r.uid}`,
+            success: function(resp) {
+                li_ele.find("a.likee_id").html(resp.nickname);
+                li_ele.find("span.likee_img").css('background-image', `url('${resp.avatar.large}')`);
+            },
+            error: function(resp) {
+                // console.warn("[bgm_luck] bangumi api fails");
+            }
+        });
+        // $.ajax({
+        //     timeout: 2000,
+        //     contentType: 'application/json',
+        //     type: 'GET',
+        //     url: `https://api.bgm.tv/v0/users/${r.last_liker}`,
+        //     success: function(resp) {
+        //         li_ele.find("a.liker_id").html(resp.nickname);
+        //     },
+        //     error: function(resp) {
+        //         // console.warn("[bgm_luck] bangumi api fails");
+        //     }
+        // });
+        $.ajax({
+            timeout: 2000,
+            contentType: 'application/json',
+            type: 'GET',
+            url: `https://api.bgm.tv/v0/subjects/${r.sid}`,
+            success: function(resp) {
+                li_ele.find("a.subject_id").html(resp.name);
+                li_ele.find("img.subject_img").attr('src', resp.images.grid.replace('100','100x100'));
+            },
+            error: function(resp) {
+                // console.warn("[bgm_luck] bangumi api fails");
+            }
+        });
+        
+        // bind btns
+        li_ele.info = {
+            uid: r.uid,
+            sid: r.sid
+        }
+        let clickable = li_ele.find('div.quote');
+        if (clickable.length) {
+            li_ele.status = {
+                liked: false,
+                likers: [],
+                nlikers: -1,
+            };
+            clickable.css('cursor', 'pointer');
+            clickable.on('click', function (e) {
+                if (ppup.last_time_click == li_ele) {
+                    ppup.fadeOut();
+                    ppup.last_time_click = null;
+                } else {
+                    ppup.hide()
+                    ppupRefill(li_ele, ppup);
+                    ppup.css({left: e.pageX-20});
+                    ppup.css({top: e.pageY-40});
+                    ppup.fadeIn();
+                    ppup.last_time_click = li_ele;
+                }
+            });
+        }
+
+    });
+}
+
+function buildTmlItems(records) {
+    const li_eles = records.map(
+        function(r) {
+            const user_img = '//lain.bgm.tv/pic/user/l/icon.jpg';
+            const span_avatar_image = `<span class="avatarNeue avatarReSize40 ll likee_img" style="background-image:url('${user_img}')"></span>`;
+            const span_avatar = `<span class="avatar"><a href="/user/${r.uid}" class="avatar">${span_avatar_image}</a></span>`;
+
+            const subject_img = '/img/no_img.gif';
+            const span_subject = `<a href="/subject/${r.sid}"><img src="${subject_img}" alt class="rr subject_img" width="48"></a>`;
+            // const liker_name = `<a href="/user/${r.last_liker}" class="l liker_id">${r.last_liker}</a>`;
+            const liker_name = `${r.likes} 位bgmer`
+            const likee_name = `<a href="/user/${r.uid}" class="l likee_id">${r.uid}</a>`;
+            const subject_name = `<a href="/user/${r.sid}" class="l subject_id">${r.sid}</a>`;
+            const collect_info = `<div class="collectInfo"><div class="quote"><q>${r.comment}</q></div></div>`
+            const time_stamp = `<p class="date">${relativeTime(Date.parse(r.time))}</p>`
+
+            const span_info = `<span class="info clearit">${span_subject}${liker_name} 喜欢了 ${likee_name} 对 ${subject_name} 的短评: ${collect_info} ${time_stamp}</span>`
+            const li = `<li id=${r.id} class="clearit tml_item"> ${span_avatar} ${span_info} </li>`
+            return li
+        }
+    )
+    return li_eles.join('');
+}
+
+function relativeTime(date) {
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+
+    var elapsed = new Date() - date;
+
+    if (elapsed < msPerMinute) 
+         return '刚刚';   
+    else if (elapsed < msPerHour) 
+         return Math.round(elapsed/msPerMinute) + '分钟前';   
+    else if (elapsed < msPerDay ) 
+         return Math.round(elapsed/msPerHour ) + '小时前';   
+    else return `${date.toLocaleDateString('zh-Hans-CN')}`
+}
