@@ -124,16 +124,13 @@ function addCard(cmt) {
 
 function toast(e, msg) {
     const ppup = $(".popup");
-    if (ppup.is(':visible') && msg === ppup.find('p').html()) {
-        // console.log('same info');
-        ppup.fadeOut();
-    } else {
-        ppup.hide();
-        ppup.css({right:  $(window).width() - e.pageX});
-        ppup.css({top: e.pageY});
-        ppup.find('p').html(msg);
-        ppup.fadeIn();
-    }
+
+    ppup.hide();
+    ppup.css({right:  $(window).width() - e.pageX});
+    ppup.css({top: e.pageY});
+    ppup.find('p').html(msg);
+    ppup.fadeIn();
+
 }
 
 function relativeTime(date) {

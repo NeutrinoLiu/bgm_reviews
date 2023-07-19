@@ -230,7 +230,7 @@ function show_status(cmt, ppup, duplicate=false) {
         return `<a href="/user/${liker}" target="_blank">${liker}</a>`;
     });
     if (duplicate) {
-        ppup.find('p').html(`该短评已经点赞`);
+        ppup.find('p').html(`你已喜欢该短评`);
         ppup.find('p').fadeIn();
         setTimeout(function(){
             ppup.find('p').hide();
@@ -307,6 +307,8 @@ function disable_btn(btn, prompt) {
     btn.css('cursor', 'default');
     btn.css('background', 'grey');
     btn.html(prompt);
+    btn.removeAttr('href');
+    btn.removeAttr('target');
     btn.unbind();
 }
 
@@ -315,6 +317,8 @@ function enable_btn(btn, prompt, func) {
     btn.css('background', '');
     btn.html(prompt);
     btn.unbind();
+    btn.removeAttr('href');
+    btn.removeAttr('target');
     btn.on('click', func);
 }
 
@@ -373,11 +377,15 @@ function addLoginBtn() {
         let callback_timeout;
         let child_close_timer;
         const callback_create = function(resp) {
-            login_btn.html('请在弹出页里授权');
+            login_btn.html('没有弹出页？手动点击');
+            login_btn.attr('href', resp.oauth_url);
+            login_btn.attr('target', '_blank');
             LOGIN_TOKEN_TICKET = resp.ticket;
             console.log(`[bgm_luck] fetched ticket ${LOGIN_TOKEN_TICKET} for ${uid}`);
+            // setTimeout( function() {
             const child = window.open(resp.oauth_url, "","width=550,height=550,toolbar=0,status=0,");
-            callback_timeout = setTimeout(next_step, '3000') // enable manual toggle after 3s
+            login_btn.
+            callback_timeout = setTimeout(next_step, 5000) // enable manual toggle after 3s
             child_close_timer = setInterval(function() {           // detect child close 
                 if(child.closed) {
                     clearInterval(child_close_timer);
@@ -386,6 +394,7 @@ function addLoginBtn() {
                     fetch_token();
                 }
             }, 500);
+            // }, 1);
         };
 
         // 1.0: send out login create request
