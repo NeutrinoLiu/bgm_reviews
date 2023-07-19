@@ -259,6 +259,7 @@ function show_status(cmt, ppup, duplicate=false) {
 
 function ppupRefill(cmt, ppup) {
     ppup.master = cmt;
+    clearTimeout(ppup.timeout);
     ppup.unbind();
     if (cmt.status.liked) {
         ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
