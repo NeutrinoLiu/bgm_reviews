@@ -236,23 +236,22 @@ function show_status(cmt, ppup, duplicate=false) {
         return;
     }
     const build_links = function (uids, names) {
-        const MAX = 5;
-        let ret = '';
+        let ret = [];
         uids.forEach( (uid, i)=>{
-            ret += `<a href="/user/${uid}" target="_blank">${names[i]}</a>`;
+            ret.unshift(`<a href="/user/${uid}" target="_blank">${names[i]}</a>`);
         })
-        return ret;        
+        return ret.join('、');        
     }
     if (duplicate) {
         ppup.find('p').html(`你已喜欢该短评`);
         ppup.find('p').fadeIn();
         ppup.timeout = setTimeout(function(){
             ppup.find('p').hide();
-            ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
+            ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
             ppup.find('p').fadeIn();
         }, 1000);
     } else {
-        ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
+        ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
         ppup.find('p').fadeIn();
     }
 }
@@ -353,18 +352,22 @@ function addLoginPanel() {
 
     // update lucky_login_status
     let login_info = localStorage.getItem(LUCKY_LOGIN_KEY);
-    let cur_uid = getUid()
-    if (login_info) {
-        login_info = JSON.parse(login_info);
-        if (login_info.uid === cur_uid)
-            addLogoutBtn(login_info);
-        else {
-            localStorage.removeItem(LUCKY_LOGIN_KEY);
-            console.log('[bgm_luck] remove last user token');
+    try { 
+        let cur_uid = getUid();
+        if (login_info) {
+            login_info = JSON.parse(login_info);
+            if (login_info.uid === cur_uid)
+                addLogoutBtn(login_info);
+            else {
+                localStorage.removeItem(LUCKY_LOGIN_KEY);
+                console.log('[bgm_luck] remove last user token');
+                addLoginBtn();
+            }
+        } else {
             addLoginBtn();
         }
-    } else {
-        addLoginBtn();
+    } catch {
+        $('#lucky_login_status').html('请先登录班固米')
     }
 }
 
