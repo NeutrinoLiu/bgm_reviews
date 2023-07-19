@@ -287,8 +287,8 @@ function show_status(cmt, ppup, duplicate=false) {
         if (duplicate) {
             ppup.find('p').html(`你已喜欢该短评`);
             ppup.find('p').fadeIn();
-            ppup.on('click', function(){
-                ppup.unbind()
+            ppup.find('.lucky_popup_icon').on('click', function(){
+                ppup.find('.lucky_popup_icon').unbind()
                 cancel_like(cmt, ppup);
             });
             ppup.timeout = setTimeout(function(){
@@ -299,8 +299,8 @@ function show_status(cmt, ppup, duplicate=false) {
         } else {
             ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
             ppup.find('p').fadeIn();
-            ppup.on('click', function(){
-                ppup.unbind()
+            ppup.find('.lucky_popup_icon').on('click', function(){
+                ppup.find('.lucky_popup_icon').unbind()
                 cancel_like(cmt, ppup);
             });
         }
@@ -310,9 +310,9 @@ function show_status(cmt, ppup, duplicate=false) {
         ppup.find('p').hide();
         ppup.find('p').html('已取消喜欢');
         ppup.find('p').fadeIn();
-        ppup.on('click', function(){
+        ppup.find('.lucky_popup_icon').on('click', function(){
             ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
-            ppup.unbind();
+            ppup.find('.lucky_popup_icon').unbind();
             send_like(cmt, ppup);
         });
     }
@@ -321,7 +321,7 @@ function show_status(cmt, ppup, duplicate=false) {
 function ppupRefill(cmt, ppup) {
     ppup.master = cmt;
     clearTimeout(ppup.timeout);
-    ppup.unbind();
+    ppup.find('.lucky_popup_icon').unbind();
     if (cmt.status.liked) {
         ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
         show_status(cmt, ppup);
@@ -329,9 +329,9 @@ function ppupRefill(cmt, ppup) {
         ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
         ppup.find('p').html('');
         ppup.find('p').hide();
-        ppup.on('click', function(){
+        ppup.find('.lucky_popup_icon').on('click', function(){
             ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
-            ppup.unbind()
+            ppup.find('.lucky_popup_icon').unbind()
             send_like(cmt, ppup);
         });
     }
