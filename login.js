@@ -213,6 +213,7 @@ function send_like(cmt, ppup) {
                 cmt.status.liked = resp.like_succeed >= 0;
                 cmt.status.likers = resp.likers;
                 cmt.status.nlikers = resp.nlikers;
+                cmt.status.unames = resp.unames;
                 show_status(cmt, ppup, resp.like_succeed == 0);
             },
             error : function() {
@@ -229,19 +230,24 @@ function show_status(cmt, ppup, duplicate=false) {
     if (cmt != ppup.master) {
         return;
     }
-    const cmt_href = cmt.status.likers.slice(0,5).map(function(liker){
-        return `<a href="/user/${liker}" target="_blank">${liker}</a>`;
-    });
+    const build_links = function (uids, names) {
+        const MAX = 5;
+        let ret = '';
+        uids.forEach( (uid, i)=>{
+            ret += `<a href="/user/${uid}" target="_blank">${names[i]}</a>`;
+        })
+        return ret;        
+    }
     if (duplicate) {
         ppup.find('p').html(`你已喜欢该短评`);
         ppup.find('p').fadeIn();
         ppup.timeout = setTimeout(function(){
             ppup.find('p').hide();
-            ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
+            ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
             ppup.find('p').fadeIn();
         }, 1000);
     } else {
-        ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
+        ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)} 等${cmt.status.nlikers}位bgmer喜欢了该短评`);
         ppup.find('p').fadeIn();
     }
 }
@@ -274,6 +280,7 @@ function bindComments(ppup, list, selector, parser) {
                 liked: false,
                 likers: [],
                 nlikers: -1,
+                unames: [],
             };
             clickable.css('cursor', 'pointer');
             clickable.on('click', function (e) {
@@ -494,7 +501,7 @@ function showReviewTimeline(){
             <div id="timeline">
                 <h4 class="Header">
                 <a id="refresh_header">刷新</a> | 
-                <a href="https://neutrinoliu.github.io/bgm_reviews/" target="_blank">Feeling Lucky Waterfall</a>
+                <a href="https://neutrinoliu.github.io/bgm_reviews/" target="_blank">Feeling Lucky Masonry</a>
                 </h4>
                 <ul>${buildTmlItems(resp)}</ul>
             </div>`)
@@ -589,18 +596,18 @@ function buildTmlItems(records) {
         function(r) {
             const user_img = '//lain.bgm.tv/pic/user/l/icon.jpg';
             const span_avatar_image = `<span class="avatarNeue avatarReSize40 ll likee_img" style="background-image:url('${user_img}')"></span>`;
-            const span_avatar = `<span class="avatar"><a href="/user/${r.uid}" class="avatar">${span_avatar_image}</a></span>`;
+            const span_avatar = `<span class="avatar"><a href="/user/${r.uid}" target="_blank" class="avatar" >${span_avatar_image}</a></span>`;
 
             const subject_img = '/img/no_img.gif';
-            const span_subject = `<a href="/subject/${r.sid}"><img src="${subject_img}" alt class="rr subject_img" width="48"></a>`;
+            const span_subject = `<a href="/subject/${r.sid}" target="_blank"><img src="${subject_img}" alt class="rr subject_img" width="48"></a>`;
             // const liker_name = `<a href="/user/${r.last_liker}" class="l liker_id">${r.last_liker}</a>`;
             const liker_name = `${r.likes} 位bgmer`
-            const likee_name = `<a href="/user/${r.uid}" class="l likee_id">${r.uid}</a>`;
-            const subject_name = `<a href="/user/${r.sid}" class="l subject_id">${r.sid}</a>`;
+            const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
+            const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
             const collect_info = `<div class="collectInfo"><div class="quote"><q>${r.comment}</q></div></div>`
             const time_stamp = `<p class="date">${relativeTime(Date.parse(r.time))}</p>`
 
-            const span_info = `<span class="info clearit">${span_subject}${liker_name} 喜欢了 ${likee_name} 对 ${subject_name} 的短评: ${collect_info} ${time_stamp}</span>`
+            const span_info = `<span class="info clearit">${span_subject}${liker_name}喜欢了 ${likee_name} 对 ${subject_name} 的短评: ${collect_info} ${time_stamp}</span>`
             const li = `<li id=${r.id} class="clearit tml_item"> ${span_avatar} ${span_info} </li>`
             return li
         }
