@@ -5,7 +5,7 @@ function addStyle() {
         animation: target-fade 1s;
     }
     @keyframes target-fade {
-        from { background-color: red; } 
+        from { background-color: white; } 
         to { background-color: transparent; }
     }
     .lucky_popup {
@@ -231,6 +231,46 @@ function send_like(cmt, ppup) {
     }
 }
 
+function cancel_like(cmt, ppup) {
+    const id_token = getIdentity();
+    if (! id_token) {
+        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        ppup.find('p').html(`<a href="https://${location.host}/#lucky_login_panel">请先在主页授权</a>`);
+        ppup.find('p').fadeIn();
+    } else {
+        const post_data = {
+            liker: id_token.uid,
+            token: id_token.token,
+            detail: { uid: cmt.info.uid, sid: cmt.info.sid}
+        }
+        // console.log(post_data);
+        $.ajax({
+            timeout: 5000,
+            type:'POST',
+            crossDomain: true,
+            contentType: 'application/json',
+            url: 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/cancel_like',
+            dataType: 'json',
+            data: JSON.stringify(post_data),
+            success : function(resp) {
+                cmt.status = {
+                    liked: false,
+                    likers: [],
+                    nlikers: -1,
+                    unames: [],
+                };
+                show_status(cmt, ppup);
+            },
+            error : function() {
+                console.warn('[bgm_luck] dislike fails');
+                ppup.find('p').html('取消喜欢失败');
+                ppup.find('p').fadeIn();
+            }
+        });
+    }
+}
+
+
 function show_status(cmt, ppup, duplicate=false) {
     if (cmt != ppup.master) {
         return;
@@ -242,17 +282,39 @@ function show_status(cmt, ppup, duplicate=false) {
         })
         return ret.join('、');        
     }
-    if (duplicate) {
-        ppup.find('p').html(`你已喜欢该短评`);
-        ppup.find('p').fadeIn();
-        ppup.timeout = setTimeout(function(){
-            ppup.find('p').hide();
+    if (cmt.status.liked) {
+        // if it is a liked
+        if (duplicate) {
+            ppup.find('p').html(`你已喜欢该短评`);
+            ppup.find('p').fadeIn();
+            ppup.on('click', function(){
+                ppup.unbind()
+                cancel_like(cmt, ppup);
+            });
+            ppup.timeout = setTimeout(function(){
+                ppup.find('p').hide();
+                ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
+                ppup.find('p').fadeIn();
+            }, 1000);
+        } else {
             ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
             ppup.find('p').fadeIn();
-        }, 1000);
+            ppup.on('click', function(){
+                ppup.unbind()
+                cancel_like(cmt, ppup);
+            });
+        }
     } else {
-        ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
+        // if it is not liked
+        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        ppup.find('p').hide();
+        ppup.find('p').html('已取消喜欢');
         ppup.find('p').fadeIn();
+        ppup.on('click', function(){
+            ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
+            ppup.unbind();
+            send_like(cmt, ppup);
+        });
     }
 }
 
