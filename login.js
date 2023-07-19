@@ -226,17 +226,20 @@ function send_like(cmt, ppup) {
 }
 
 function show_status(cmt, ppup, duplicate=false) {
+    if (cmt != ppup.master) {
+        return;
+    }
     const cmt_href = cmt.status.likers.slice(0,5).map(function(liker){
         return `<a href="/user/${liker}" target="_blank">${liker}</a>`;
     });
     if (duplicate) {
         ppup.find('p').html(`你已喜欢该短评`);
         ppup.find('p').fadeIn();
-        setTimeout(function(){
+        ppup.timeout = setTimeout(function(){
             ppup.find('p').hide();
             ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位班友喜欢了该短评`);
             ppup.find('p').fadeIn();
-        }, 1500);
+        }, 1000);
     } else {
         ppup.find('p').html(`${cmt_href.join('、')} 等${cmt.status.nlikers}位班友喜欢了该短评`);
         ppup.find('p').fadeIn();
@@ -244,6 +247,7 @@ function show_status(cmt, ppup, duplicate=false) {
 }
 
 function ppupRefill(cmt, ppup) {
+    ppup.master = cmt;
     ppup.unbind();
     if (cmt.status.liked) {
         ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
