@@ -200,12 +200,12 @@ function hookPopup() {
         // use 
         const ret = {
             uid: $(ele).attr('data-item-user'),
-            sid: $(ele).find('a:last').attr('href').split('/').slice(-1)[0],
+            sid: $(ele).find('a.l:last').attr('href').split('/').slice(-1)[0],
             date: today_date(), // simply use today for tml reviews
             stars: star_digest($(ele).find('.starlight')),
             content: content_digest($(ele).find('div.quote').text())
         };
-        if (!ret.uid) ret.uid = location.pathname.split('user/')[1].split('/')[0];
+        if (ret.uid === '') ret.uid = location.pathname.split('user/')[1].split('/')[0]; // in users timeline, use url to extract uid
         return ret;
     }
 
