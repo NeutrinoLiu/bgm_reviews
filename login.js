@@ -783,5 +783,5 @@ function relativeTime(date) {
          return Math.round(elapsed/msPerMinute) + '分钟前';   
     else if (elapsed < msPerDay ) 
          return Math.round(elapsed/msPerHour ) + '小时前';   
-    else return `${date.toLocaleDateString('zh-Hans-CN')}`
+    else return `${date.toLocaleDateString('zh-Hans-CN').replaceAll('/','-')}`
 }
