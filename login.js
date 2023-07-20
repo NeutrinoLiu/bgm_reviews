@@ -165,6 +165,9 @@ function hookPopup() {
     const tml_selector = function(ele) {
         return $(ele).find('div.quote');
     }
+    const lucky_selector = function(ele) {
+        return $(ele).find('div.item').find('p')
+    }
     const cbox_parser = function(ele) {
         const ret = {
             uid: $(ele).find('a').attr('href').split('/').slice(-1)[0],
@@ -208,7 +211,17 @@ function hookPopup() {
         if (ret.uid === '') ret.uid = location.pathname.split('user/')[1].split('/')[0]; // in users timeline, use url to extract uid
         return ret;
     }
-
+    const lucky_parser = function(ele) {
+        const ret = {
+            uid: $(ele).find('a#user_name').attr('href').split('/').slice(-1)[0],
+            sid: $(ele).find('div#lucky_title').attr('subject-id'),
+            date: date_digest($(ele).find('small.grey').text()),
+            stars: star_digest($(ele).find('.starlight')),
+            content: content_digest($(ele).find('div.item').find('p').text())
+        }
+        // console.log(ret);
+        return ret;
+    }
     // global popup auto hide
     PPUP_GLOBAL.toggled = false;
     $(document).click(function(event) {
@@ -228,6 +241,31 @@ function hookPopup() {
 
     const cbox_2 = $('#columnInSubjectA').find('#comment_box');    // 吐槽箱
     if (cbox_2.length) bindReviews(cbox_2.find('div.text'), cbox_selector, cbox_parser);
+
+    const lucky = $('body.bangumi').find('#lucky_field');
+    const dock = $('body.bangumi').find('#dock');
+    function add_luck_card_observer() {
+        if (lucky.length) {
+            const lucky_callback = function(){
+                if (lucky.find('#loading_cube').length == 0)
+                    bindReviews(lucky.find('.lucky_card_class'), lucky_selector, lucky_parser);
+            };
+            const lucky_observer = new MutationObserver(lucky_callback);
+            lucky_observer.observe(lucky.get(0), {childList: true, subtree:true});
+            return true;
+        }
+        return false;
+    }
+    add_luck_card_observer();
+    // when lucky_field hasn't been added, and dock is available
+    // if (! add_luck_card_observer() && dock.length) {
+    //     const dock_callback = function(mutationList, obs){
+    //         console.log('[bgm_luck] trying lazy load lucky_like_observer')
+    //         if (add_luck_card_observer()) obs.disconnect();
+    //     };
+    //     const dock_observer = new MutationObserver(dock_callback);
+    //     dock_observer.observe(dock.get(0), {childList: true, subtree:true});
+    // }
 
     const tml = $('#tmlContent');
     if (tml.length) {
@@ -409,6 +447,7 @@ function bindReviews(list, selector, parser) {
         if (clickable.length)
             try {
                 ele.info = parser(ele);
+                // console.log(ele.info)
                 // reveiws in collecetion might be empty, want to ignore them
                 // hence call parser first
                 // parser may fail, jsut skip this ele in this case
