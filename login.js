@@ -114,12 +114,12 @@ function hookPopup() {
             return new Date().toLocaleDateString("zh-Hans-CN");
         else return ts.replace('@ ', '').split(' ')[0]
     }
-    const get_star = function (ele) {
+    const star_digest = function (ele) {
         if (ele.length)
             return Number(ele.attr('class').split(' ')[1].replace('stars',''));
         else return 0;
     }
-    const trimSpace = function (ele) {
+    const content_digest = function (ele) {
         if (! ele) return ele;
         return ele.replaceAll('\n', ' ').replaceAll('\t', ' ').trimStart();
     }
@@ -133,13 +133,16 @@ function hookPopup() {
     const blist_selector = function(ele) {
         return $(ele).find('div.text');
     }
+    const tml_selector = function(ele) {
+        return $(ele).find('div.quote');
+    }
     const cbox_parser = function(ele) {
         const ret = {
             uid: $(ele).find('a').attr('href').split('/').slice(-1)[0],
             sid: get_sid_from_url(),
             date: date_digest($(ele).find('small.grey').text()),
-            stars: get_star($(ele).find('.starlight')),
-            content: trimSpace($(ele).find('p').text())
+            stars: star_digest($(ele).find('.starlight')),
+            content: content_digest($(ele).find('p').text())
         }
         return ret;
     }
@@ -148,8 +151,8 @@ function hookPopup() {
             uid: $(ele).find('a').attr('href').split('/').slice(-1)[0],
             sid: get_sid_from_url(),
             date: date_digest($(ele).find('p.info').text()),
-            stars: get_star($(ele).find('.starlight')),
-            content: trimSpace($(ele).html().split('</p>')[1].split('</div>')[0])
+            stars: star_digest($(ele).find('.starlight')),
+            content: content_digest($(ele).html().split('</p>')[1].split('</div>')[0])
         }
         return ret;
     }
@@ -157,11 +160,23 @@ function hookPopup() {
         const ret = {
             uid: get_uid_from_url(),
             sid: $(ele).find('a').attr('href').split('/').slice(-1)[0],
-            date: $(ele).find('span.tip_j').text(),
-            stars: get_star($(ele).find('.starlight')),
-            content: trimSpace($(ele).find('div.text').text())
+            date: date_digest($(ele).find('span.tip_j').text()),
+            stars: star_digest($(ele).find('.starlight')),
+            content: content_digest($(ele).find('div.text').text())
         }
         return ret;
+    }
+    const tml_parser = function(ele) {
+        // note: trigger tml parser only when reveiwTimeline is not active!
+        // use 
+        const ret = {
+            uid: $(ele).find('a.avatar').attr('href').split('/').slice(-1)[0],
+            sid: $(ele).find('a:last').attr('href').split('/').slice(-1)[0],
+            date: new Date().toLocaleDateString("zh-Hans-CN"), // simply use today for tml reviews
+            stars: star_digest($(ele).find('.starlight')),
+            content: content_digest($(ele).find('div.quote').text())
+        };
+        return ret
     }
 
     const popup_raw = `
@@ -172,22 +187,42 @@ function hookPopup() {
         </div></div>`;
     $('body.bangumi').append(popup_raw);
 
-    const mpopup = $('.lucky_popup');
+    let mpopup = $('.lucky_popup');
+    mpopup.toggled = false;
+
+    // global flag clear
+    $(document).click(function(event) {
+        if (! mpopup.toggled) mpopup.fadeOut()
+        mpopup.toggled = false;
+    });
+
 
     const ucont = $('#memberUserList'); // collections 页面
-    if (ucont.length) bindComments(mpopup, ucont.find('div.userContainer'), ucont_selector, ucont_parser);
+    if (ucont.length) bindReviews(mpopup, ucont.find('div.userContainer'), ucont_selector, ucont_parser);
 
     const blist = $('div.mainWrapper').find('#browserItemList'); // 用户收藏页
-    if (blist.length) bindComments(mpopup, blist.find('li.item'), blist_selector, blist_parser);
+    if (blist.length) bindReviews(mpopup, blist.find('li.item'), blist_selector, blist_parser);
 
     const cbox = $('#columnSubjectHomeB').find('#comment_box');    // 吐槽箱
-    if (cbox.length) bindComments(mpopup, cbox.find('div.text'), cbox_selector, cbox_parser);
+    if (cbox.length) bindReviews(mpopup, cbox.find('div.text'), cbox_selector, cbox_parser);
 
     const cbox_2 = $('#columnInSubjectA').find('#comment_box');    // 吐槽箱
-    if (cbox_2.length) bindComments(mpopup, cbox_2.find('div.text'), cbox_selector, cbox_parser);
+    if (cbox_2.length) bindReviews(mpopup, cbox_2.find('div.text'), cbox_selector, cbox_parser);
 
-
+    const tml = $('#tmlContent');
+    if (tml.length) {
+        const tml_obs_callback = function(){
+            // console.log('observer triggered')
+            // note: trigger tml parser only when reveiwTimeline is not active!
+            if (tml.find('bgm_reivews_link'.length == 0))
+                bindReviews(mpopup, tml.find('li.tml_item'), tml_selector, tml_parser);
+        };
+        tml_obs_callback();
+        const tml_observer = new MutationObserver(tml_obs_callback);
+        tml_observer.observe(tml.get(0), {childList: true});
+    }
 }
+
 
 function getIdentity() {
     return JSON.parse(localStorage.getItem(LUCKY_LOGIN_KEY));
@@ -288,6 +323,7 @@ function show_status(cmt, ppup, duplicate=false) {
             ppup.find('p').html(`你已喜欢该短评`);
             ppup.find('p').fadeIn();
             ppup.find('.lucky_popup_icon').on('click', function(){
+                ppup.toggled = true;
                 ppup.find('.lucky_popup_icon').unbind()
                 cancel_like(cmt, ppup);
             });
@@ -300,6 +336,7 @@ function show_status(cmt, ppup, duplicate=false) {
             ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
             ppup.find('p').fadeIn();
             ppup.find('.lucky_popup_icon').on('click', function(){
+                ppup.toggled = true;
                 ppup.find('.lucky_popup_icon').unbind()
                 cancel_like(cmt, ppup);
             });
@@ -311,6 +348,7 @@ function show_status(cmt, ppup, duplicate=false) {
         ppup.find('p').html('已取消喜欢');
         ppup.find('p').fadeIn();
         ppup.find('.lucky_popup_icon').on('click', function(){
+            ppup.toggled = true;
             ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
             ppup.find('.lucky_popup_icon').unbind();
             send_like(cmt, ppup);
@@ -330,6 +368,7 @@ function ppupRefill(cmt, ppup) {
         ppup.find('p').html('');
         ppup.find('p').hide();
         ppup.find('.lucky_popup_icon').on('click', function(){
+            ppup.toggled = true;
             ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
             ppup.find('.lucky_popup_icon').unbind()
             send_like(cmt, ppup);
@@ -337,33 +376,41 @@ function ppupRefill(cmt, ppup) {
     }
 }
 
-function bindComments(ppup, list, selector, parser) {
+function bindReviews(ppup, list, selector, parser) {
     list.each( function() {
         const ele = this;
-        ele.info = parser(ele);
         let clickable = selector(ele);
-        if (clickable.length && ele.info.content && ele.info.content != '') {
-            ele.status = {
-                liked: false,
-                likers: [],
-                nlikers: -1,
-                unames: [],
-            };
-            clickable.css('cursor', 'pointer');
-            clickable.on('click', function (e) {
-                if (ppup.last_time_click == ele) {
-                    ppup.fadeOut();
-                    ppup.last_time_click = null;
-                } else {
-                    ppup.hide()
-                    ppupRefill(ele, ppup);
-                    ppup.css({left: e.pageX-20});
-                    ppup.css({top: e.pageY-40});
-                    ppup.fadeIn();
-                    ppup.last_time_click = ele;
+        if (clickable.length)
+            try {
+                ele.info = parser(ele);
+                // reveiws in collecetion might be empty, want to ignore them
+                // hence call parser first
+                // parser may fail, jsut skip this ele in this case
+                if (ele.info.content && ele.info.content != '') {
+                    ele.status = {
+                        liked: false,
+                        likers: [],
+                        nlikers: -1,
+                        unames: [],
+                    };
+                    clickable.css('cursor', 'pointer');
+                    clickable.unbind();
+                    clickable.on('click', function (e) {
+                        ppup.toggled = true;
+                        if (ppup.last_time_click == ele && ppup.is(":visible")) {
+                            ppup.fadeOut();
+                            ppup.last_time_click = null;
+                        } else {
+                            ppup.hide()
+                            ppupRefill(ele, ppup);
+                            ppup.css({left: e.pageX-20});
+                            ppup.css({top: e.pageY-40});
+                            ppup.fadeIn();
+                            ppup.last_time_click = ele;
+                        }
+                    });
                 }
-            });
-        }
+            } catch {}
     });
 }
 
@@ -572,7 +619,7 @@ function showReviewTimeline(){
             <div id="timeline">
                 <h4 class="Header">
                 <a id="refresh_header">刷新</a> | 
-                <a href="https://neutrinoliu.github.io/bgm_reviews/" target="_blank">Feeling Lucky Masonry</a>
+                <a id="bgm_reivews_link " href="https://neutrinoliu.github.io/bgm_reviews/" target="_blank">Feeling Lucky Masonry</a>
                 </h4>
                 <ul>${buildTmlItems(resp)}</ul>
             </div>`)
@@ -645,6 +692,7 @@ function refillTmlItems(records) {
             };
             clickable.css('cursor', 'pointer');
             clickable.on('click', function (e) {
+                ppup.toggled = true;
                 if (ppup.last_time_click == li_ele) {
                     ppup.fadeOut();
                     ppup.last_time_click = null;
@@ -676,7 +724,7 @@ function buildTmlItems(records) {
             const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
             const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
             const collect_info = `<div class="collectInfo"><div class="quote"><q>${r.comment}</q></div></div>`
-            const time_stamp = `<p class="date">${relativeTime(Date.parse(r.time))}</p>`
+            const time_stamp = `<p class="date">${relativeTime(new Date(r.time))}</p>`
 
             const span_info = `<span class="info clearit" >${span_subject}${liker_name}喜欢了 ${likee_name} 对 ${subject_name} 的短评: ${collect_info} ${time_stamp}</span>`
             const li = `<li id=${r.id} class="clearit tml_item"> ${span_avatar} ${span_info} </li>`
