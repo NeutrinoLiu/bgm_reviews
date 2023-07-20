@@ -104,6 +104,7 @@ $('body.bangumi').append(PPUP_RAW);
 const PPUP_GLOBAL = $('.lucky_popup');
 
 function ppupRefill(cmt) {
+    // console.log(cmt.info)
     PPUP_GLOBAL.master = cmt;
     clearTimeout(PPUP_GLOBAL.timeout);
     PPUP_GLOBAL.find('.lucky_popup_icon').unbind();
@@ -134,9 +135,12 @@ function hookPopup() {
     const get_uid_from_url = function() {
         return location.pathname.split('list/')[1].split('/')[0];
     }
+    const today_date = function() {
+        return new Date().toLocaleDateString("zh-Hans-CN").replaceAll('/','-');
+    }
     const date_digest = function (ts) {
         if (ts.includes('ago'))
-            return new Date().toLocaleDateString("zh-Hans-CN");
+            return today_date();
         else return ts.replace('@ ', '').split(' ')[0]
     }
     const star_digest = function (ele) {
@@ -197,11 +201,12 @@ function hookPopup() {
         const ret = {
             uid: $(ele).attr('data-item-user'),
             sid: $(ele).find('a:last').attr('href').split('/').slice(-1)[0],
-            date: new Date().toLocaleDateString("zh-Hans-CN"), // simply use today for tml reviews
+            date: today_date(), // simply use today for tml reviews
             stars: star_digest($(ele).find('.starlight')),
             content: content_digest($(ele).find('div.quote').text())
         };
-        return ret
+        if (!ret.uid) ret.uid = location.pathname.split('user/')[1].split('/')[0];
+        return ret;
     }
 
     // global popup auto hide
@@ -229,7 +234,7 @@ function hookPopup() {
         const tml_obs_callback = function(){
             // console.log('observer triggered')
             // note: trigger tml parser only when reveiwTimeline is not active!
-            if (tml.find('bgm_reivews_link'.length == 0))
+            if (tml.find('#bgm_reivews_link').length == 0)
                 bindReviews(tml.find('li.tml_item'), tml_selector, tml_parser);
         };
         tml_obs_callback();
@@ -243,6 +248,7 @@ function getIdentity() {
 }
 
 function send_like(cmt) {
+    // console.log(cmt.info)
     const id_token = getIdentity();
     if (! id_token) {
         PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_HOLLOW);
@@ -371,6 +377,7 @@ function show_status(cmt, duplicate=false) {
 }
 
 function bindFreshLikeBtn(clickable, ele) {
+    // console.log(ele.info)
     ele.status = {
         liked: false,
         likers: [],
@@ -622,7 +629,7 @@ function buildTimelineReview(){
             <div id="timeline">
                 <h4 class="Header">
                 <a id="refresh_header" style="cursor:pointer;">最新</a> / 
-                <a id="bgm_reivews_link " onclick="window.open('https://neutrinoliu.github.io/bgm_reviews/')" style="cursor:pointer;">Feeling Lucky Masonry</a>
+                <a id="bgm_reivews_link" onclick="window.open('https://neutrinoliu.github.io/bgm_reviews/')" style="cursor:pointer;">Feeling Lucky Masonry</a>
                 </h4>
                 <ul id="tml_lucky_reviews"></ul>
                 <div class="page_inner"></div>
@@ -678,7 +685,6 @@ function redrawPage(curPage) {
 
 function refillTmlItems(records) {
     records.forEach(function (r){
-        // console.log(r);
         const li_ele = $(`#${r.id}`);
         $.ajax({
             timeout: 2000,
@@ -722,8 +728,11 @@ function refillTmlItems(records) {
         // bind btns
         li_ele.info = {
             uid: r.uid,
-            sid: r.sid
-        }
+            sid: r.sid,
+            date: r.date,
+            stars: r.star,
+            content: r.comment,
+        };
         let clickable = li_ele.find('div.quote');
         if (clickable.length) {
             bindFreshLikeBtn(clickable, li_ele);
@@ -748,7 +757,7 @@ function buildTmlItems(records) {
 
             let star_icon = '';
             if (r.star > 0)
-                star_icon= `<span class="starstop-s"><span class="starlight stars${r.stars}"></span></span>`;
+                star_icon= `<span class="starstop-s"><span class="starlight stars${r.star}"></span></span>`;
 
             const collect_info = `<div class="collectInfo">${star_icon}<div class="quote"><q>${r.comment}</q></div></div>`
             const time_stamp = `<p class="date">${relativeTime(new Date(r.time))}</p>`
