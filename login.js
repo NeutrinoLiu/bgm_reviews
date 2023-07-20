@@ -98,8 +98,33 @@ const LIKE_FILLED = `
     <svg xmlns="http://www.w3.org/2000/svg" height="1.7em" viewBox="-20 -20 550 550" id=like_beating>
     <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
     </svg>`;
-hookPopup();
+const PPUP_RAW = `<div class="lucky_popup"><div class="lucky_popup_inner"><div class="lucky_popup_icon">${LIKE_HOLLOW}</div><p hidden></p></div></div>`
 
+$('body.bangumi').append(PPUP_RAW);
+const PPUP_GLOBAL = $('.lucky_popup');
+
+function ppupRefill(cmt) {
+    PPUP_GLOBAL.master = cmt;
+    clearTimeout(PPUP_GLOBAL.timeout);
+    PPUP_GLOBAL.find('.lucky_popup_icon').unbind();
+    if (cmt.status.liked) {
+        PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_FILLED);
+        show_status(cmt);
+    } else {
+        PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        PPUP_GLOBAL.find('p').html('');
+        PPUP_GLOBAL.find('p').hide();
+        PPUP_GLOBAL.find('.lucky_popup_icon').on('click', function(){
+            PPUP_GLOBAL.toggled = true;
+            PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_FILLED);
+            PPUP_GLOBAL.find('.lucky_popup_icon').unbind()
+            send_like(cmt);
+        });
+    }
+}
+
+
+hookPopup();
 
 function hookPopup() {
     // ** utils **
@@ -170,7 +195,7 @@ function hookPopup() {
         // note: trigger tml parser only when reveiwTimeline is not active!
         // use 
         const ret = {
-            uid: $(ele).find('a.avatar').attr('href').split('/').slice(-1)[0],
+            uid: $(ele).attr('data-item-user'),
             sid: $(ele).find('a:last').attr('href').split('/').slice(-1)[0],
             date: new Date().toLocaleDateString("zh-Hans-CN"), // simply use today for tml reviews
             stars: star_digest($(ele).find('.starlight')),
@@ -179,35 +204,25 @@ function hookPopup() {
         return ret
     }
 
-    const popup_raw = `
-    <div class="lucky_popup">
-        <div class="lucky_popup_inner">
-            <div class="lucky_popup_icon">${LIKE_HOLLOW}</div>
-            <p hidden></p>
-        </div></div>`;
-    $('body.bangumi').append(popup_raw);
-
-    let mpopup = $('.lucky_popup');
-    mpopup.toggled = false;
-
-    // global flag clear
+    // global popup auto hide
+    PPUP_GLOBAL.toggled = false;
     $(document).click(function(event) {
-        if (! mpopup.toggled) mpopup.fadeOut()
-        mpopup.toggled = false;
+        if (! PPUP_GLOBAL.toggled) PPUP_GLOBAL.fadeOut()
+        PPUP_GLOBAL.toggled = false;
     });
 
 
     const ucont = $('#memberUserList'); // collections 页面
-    if (ucont.length) bindReviews(mpopup, ucont.find('div.userContainer'), ucont_selector, ucont_parser);
+    if (ucont.length) bindReviews(ucont.find('div.userContainer'), ucont_selector, ucont_parser);
 
     const blist = $('div.mainWrapper').find('#browserItemList'); // 用户收藏页
-    if (blist.length) bindReviews(mpopup, blist.find('li.item'), blist_selector, blist_parser);
+    if (blist.length) bindReviews(blist.find('li.item'), blist_selector, blist_parser);
 
     const cbox = $('#columnSubjectHomeB').find('#comment_box');    // 吐槽箱
-    if (cbox.length) bindReviews(mpopup, cbox.find('div.text'), cbox_selector, cbox_parser);
+    if (cbox.length) bindReviews(cbox.find('div.text'), cbox_selector, cbox_parser);
 
     const cbox_2 = $('#columnInSubjectA').find('#comment_box');    // 吐槽箱
-    if (cbox_2.length) bindReviews(mpopup, cbox_2.find('div.text'), cbox_selector, cbox_parser);
+    if (cbox_2.length) bindReviews(cbox_2.find('div.text'), cbox_selector, cbox_parser);
 
     const tml = $('#tmlContent');
     if (tml.length) {
@@ -215,7 +230,7 @@ function hookPopup() {
             // console.log('observer triggered')
             // note: trigger tml parser only when reveiwTimeline is not active!
             if (tml.find('bgm_reivews_link'.length == 0))
-                bindReviews(mpopup, tml.find('li.tml_item'), tml_selector, tml_parser);
+                bindReviews(tml.find('li.tml_item'), tml_selector, tml_parser);
         };
         tml_obs_callback();
         const tml_observer = new MutationObserver(tml_obs_callback);
@@ -223,17 +238,16 @@ function hookPopup() {
     }
 }
 
-
 function getIdentity() {
     return JSON.parse(localStorage.getItem(LUCKY_LOGIN_KEY));
 }
 
-function send_like(cmt, ppup) {
+function send_like(cmt) {
     const id_token = getIdentity();
     if (! id_token) {
-        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
-        ppup.find('p').html(`<a href="https://${location.host}/#lucky_login_panel">请先在主页授权</a>`);
-        ppup.find('p').fadeIn();
+        PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        PPUP_GLOBAL.find('p').html(`<a href="https://${location.host}/#lucky_login_panel">请先在主页授权</a>`);
+        PPUP_GLOBAL.find('p').fadeIn();
     } else {
         const post_data = {
             liker: id_token.uid,
@@ -254,24 +268,24 @@ function send_like(cmt, ppup) {
                 cmt.status.likers = resp.likers;
                 cmt.status.nlikers = resp.nlikers;
                 cmt.status.unames = resp.unames;
-                show_status(cmt, ppup, resp.like_succeed == 0);
+                show_status(cmt, resp.like_succeed == 0);
             },
             error : function() {
                 console.warn('[bgm_luck] like fails');
-                ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
-                ppup.find('p').html('点赞失败');
-                ppup.find('p').fadeIn();
+                PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+                PPUP_GLOBAL.find('p').html('点赞失败');
+                PPUP_GLOBAL.find('p').fadeIn();
             }
         });
     }
 }
 
-function cancel_like(cmt, ppup) {
+function cancel_like(cmt) {
     const id_token = getIdentity();
     if (! id_token) {
-        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
-        ppup.find('p').html(`<a href="https://${location.host}/#lucky_login_panel">请先在主页授权</a>`);
-        ppup.find('p').fadeIn();
+        PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        PPUP_GLOBAL.find('p').html(`<a href="https://${location.host}/#lucky_login_panel">请先在主页授权</a>`);
+        PPUP_GLOBAL.find('p').fadeIn();
     } else {
         const post_data = {
             liker: id_token.uid,
@@ -294,20 +308,20 @@ function cancel_like(cmt, ppup) {
                     nlikers: -1,
                     unames: [],
                 };
-                show_status(cmt, ppup);
+                show_status(cmt);
             },
             error : function() {
                 console.warn('[bgm_luck] dislike fails');
-                ppup.find('p').html('取消喜欢失败');
-                ppup.find('p').fadeIn();
+                PPUP_GLOBAL.find('p').html('取消喜欢失败');
+                PPUP_GLOBAL.find('p').fadeIn();
             }
         });
     }
 }
 
 
-function show_status(cmt, ppup, duplicate=false) {
-    if (cmt != ppup.master) {
+function show_status(cmt, duplicate=false) {
+    if (cmt != PPUP_GLOBAL.master) {
         return;
     }
     const build_links = function (uids, names) {
@@ -320,63 +334,68 @@ function show_status(cmt, ppup, duplicate=false) {
     if (cmt.status.liked) {
         // if it is a liked
         if (duplicate) {
-            ppup.find('p').html(`你已喜欢该短评`);
-            ppup.find('p').fadeIn();
-            ppup.find('.lucky_popup_icon').on('click', function(){
-                ppup.toggled = true;
-                ppup.find('.lucky_popup_icon').unbind()
-                cancel_like(cmt, ppup);
+            PPUP_GLOBAL.find('p').html(`已经喜欢该短评`);
+            PPUP_GLOBAL.find('p').fadeIn();
+            PPUP_GLOBAL.find('.lucky_popup_icon').on('click', function(){
+                PPUP_GLOBAL.toggled = true;
+                PPUP_GLOBAL.find('.lucky_popup_icon').unbind()
+                cancel_like(cmt);
             });
-            ppup.timeout = setTimeout(function(){
-                ppup.find('p').hide();
-                ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
-                ppup.find('p').fadeIn();
+            PPUP_GLOBAL.timeout = setTimeout(function(){
+                PPUP_GLOBAL.find('p').hide();
+                PPUP_GLOBAL.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
+                PPUP_GLOBAL.find('p').fadeIn();
             }, 1000);
         } else {
-            ppup.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
-            ppup.find('p').fadeIn();
-            ppup.find('.lucky_popup_icon').on('click', function(){
-                ppup.toggled = true;
-                ppup.find('.lucky_popup_icon').unbind()
-                cancel_like(cmt, ppup);
+            PPUP_GLOBAL.find('p').html(`${build_links(cmt.status.likers, cmt.status.unames)}`);
+            PPUP_GLOBAL.find('p').fadeIn();
+            PPUP_GLOBAL.find('.lucky_popup_icon').on('click', function(){
+                PPUP_GLOBAL.toggled = true;
+                PPUP_GLOBAL.find('.lucky_popup_icon').unbind()
+                cancel_like(cmt);
             });
         }
     } else {
         // if it is not liked
-        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
-        ppup.find('p').hide();
-        ppup.find('p').html('已取消喜欢');
-        ppup.find('p').fadeIn();
-        ppup.find('.lucky_popup_icon').on('click', function(){
-            ppup.toggled = true;
-            ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
-            ppup.find('.lucky_popup_icon').unbind();
-            send_like(cmt, ppup);
+        PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_HOLLOW);
+        PPUP_GLOBAL.find('p').hide();
+        PPUP_GLOBAL.find('p').html('已取消喜欢');
+        PPUP_GLOBAL.find('p').fadeIn();
+        PPUP_GLOBAL.find('.lucky_popup_icon').on('click', function(){
+            PPUP_GLOBAL.toggled = true;
+            PPUP_GLOBAL.find('.lucky_popup_icon').html(LIKE_FILLED);
+            PPUP_GLOBAL.find('.lucky_popup_icon').unbind();
+            send_like(cmt);
         });
     }
 }
 
-function ppupRefill(cmt, ppup) {
-    ppup.master = cmt;
-    clearTimeout(ppup.timeout);
-    ppup.find('.lucky_popup_icon').unbind();
-    if (cmt.status.liked) {
-        ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
-        show_status(cmt, ppup);
-    } else {
-        ppup.find('.lucky_popup_icon').html(LIKE_HOLLOW);
-        ppup.find('p').html('');
-        ppup.find('p').hide();
-        ppup.find('.lucky_popup_icon').on('click', function(){
-            ppup.toggled = true;
-            ppup.find('.lucky_popup_icon').html(LIKE_FILLED);
-            ppup.find('.lucky_popup_icon').unbind()
-            send_like(cmt, ppup);
-        });
-    }
+function bindFreshLikeBtn(clickable, ele) {
+    ele.status = {
+        liked: false,
+        likers: [],
+        nlikers: -1,
+        unames: [],
+    };
+    clickable.css('cursor', 'pointer');
+    clickable.unbind();
+    clickable.on('click', function (e) {
+        PPUP_GLOBAL.toggled = true;
+        if (PPUP_GLOBAL.last_time_click == ele && PPUP_GLOBAL.is(":visible")) {
+            PPUP_GLOBAL.fadeOut();
+            PPUP_GLOBAL.last_time_click = null;
+        } else {
+            PPUP_GLOBAL.hide()
+            ppupRefill(ele);
+            PPUP_GLOBAL.css({left: e.pageX-20});
+            PPUP_GLOBAL.css({top: e.pageY-40});
+            PPUP_GLOBAL.fadeIn();
+            PPUP_GLOBAL.last_time_click = ele;
+        }
+    });
 }
 
-function bindReviews(ppup, list, selector, parser) {
+function bindReviews(list, selector, parser) {
     list.each( function() {
         const ele = this;
         let clickable = selector(ele);
@@ -387,28 +406,7 @@ function bindReviews(ppup, list, selector, parser) {
                 // hence call parser first
                 // parser may fail, jsut skip this ele in this case
                 if (ele.info.content && ele.info.content != '') {
-                    ele.status = {
-                        liked: false,
-                        likers: [],
-                        nlikers: -1,
-                        unames: [],
-                    };
-                    clickable.css('cursor', 'pointer');
-                    clickable.unbind();
-                    clickable.on('click', function (e) {
-                        ppup.toggled = true;
-                        if (ppup.last_time_click == ele && ppup.is(":visible")) {
-                            ppup.fadeOut();
-                            ppup.last_time_click = null;
-                        } else {
-                            ppup.hide()
-                            ppupRefill(ele, ppup);
-                            ppup.css({left: e.pageX-20});
-                            ppup.css({top: e.pageY-40});
-                            ppup.fadeIn();
-                            ppup.last_time_click = ele;
-                        }
-                    });
+                    bindFreshLikeBtn(clickable, ele)
                 }
             } catch {}
     });
@@ -587,16 +585,19 @@ function addLoginBtn() {
 }
 
 // add new timeline ===================
-addTimelineReview();
-function addTimelineReview() {
+addTimelineReviewTab();
+function addTimelineReviewTab() {
     const review_tl_raw = '<li><a id="tab_lucky_review" href="javascript:;">短评时间线</a></li>'
     $('#timelineTabs > li:nth-child(2)').after(review_tl_raw);
     const tab_review_btn = $('#tab_lucky_review');
     tab_review_btn.css('cursor', 'pointer');
-    tab_review_btn.on('click', showReviewTimeline);
+    tab_review_btn.on('click', buildTimelineReview);
 }
 
-function showReviewTimeline(){
+let TML_REVIEW_CACHE;
+const NUM_REVIEWS_PER_PAGE = 5;
+
+function buildTimelineReview(){
     const tab_review_btn = $('#tab_lucky_review');
     const tml_content = $('#tmlContent');
     $('#timelineTabs').find('a').each(
@@ -607,7 +608,7 @@ function showReviewTimeline(){
     tab_review_btn.attr('class', 'focus');
     tml_content.html('<div class="loading"><img src="/img/loadingAnimation.gif"></div>');
 
-    const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time&n=10';
+    const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time';
     let ajax_req = {
         timeout: 10000,
         crossDomain: true,
@@ -615,17 +616,21 @@ function showReviewTimeline(){
         type: 'GET',
         url: url_reviews,
         success: function(resp) {
+            TML_REVIEW_CACHE = resp
+            const scope = TML_REVIEW_CACHE.slice(0, NUM_REVIEWS_PER_PAGE)
             tml_content.html(`
             <div id="timeline">
                 <h4 class="Header">
-                <a id="refresh_header">刷新</a> | 
-                <a id="bgm_reivews_link " href="https://neutrinoliu.github.io/bgm_reviews/" target="_blank">Feeling Lucky Masonry</a>
+                <a id="refresh_header" style="cursor:pointer;">最新</a> / 
+                <a id="bgm_reivews_link " onclick="window.open('https://neutrinoliu.github.io/bgm_reviews/')" style="cursor:pointer;">Feeling Lucky Masonry</a>
                 </h4>
-                <ul>${buildTmlItems(resp)}</ul>
+                <ul id="tml_lucky_reviews"></ul>
+                <div class="page_inner"></div>
             </div>`)
-            tml_content.find('#refresh_header').on('click', showReviewTimeline);
-            tml_content.find('#refresh_header').css('cursor', 'pointer');
-            refillTmlItems(resp);
+            tml_content.find('#refresh_header').on('click', buildTimelineReview); // cannot add as onlick due to its a self calling
+            tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope))
+            refillTmlItems(scope);
+            genPageBtn(0);
         },
         error: function() {
             tml_content.html('<div class="loading"><h2>服务器正在ICU抢救中 ... </h2></div>')
@@ -634,8 +639,44 @@ function showReviewTimeline(){
     $.ajax(ajax_req);
 }
 
+function genPageBtn(curPage) {
+    const tml_content = $('#tmlContent');
+    const prevpg = `<a href="javascript:;" id="lucky_tml_prev_page" class="p">‹‹上一页</a>`;
+    const nextpg = `<a href="javascript:;" id="lucky_tml_next_page" class="p">下一页 ››</a>`;
+    if (curPage == 0) {
+        tml_content.find('.page_inner').html(nextpg);
+        tml_content.find('#lucky_tml_next_page').on('click', function(){
+            redrawPage(curPage + 1);
+        });
+    } else if ((curPage+1) * NUM_REVIEWS_PER_PAGE >= TML_REVIEW_CACHE.length ) {
+        tml_content.find('.page_inner').html(prevpg);
+        tml_content.find('#lucky_tml_prev_page').on('click', function(){
+            redrawPage(curPage - 1);
+        });
+    } else {
+        tml_content.find('.page_inner').html(prevpg+nextpg);
+        tml_content.find('#lucky_tml_prev_page').on('click', function(){
+            redrawPage(curPage - 1);
+        });
+        tml_content.find('#lucky_tml_next_page').on('click', function(){
+            redrawPage(curPage + 1);
+        });
+    }
+
+}
+
+function redrawPage(curPage) {
+    const tml_content = $('#tmlContent');
+    const scope = TML_REVIEW_CACHE.slice(
+        curPage * NUM_REVIEWS_PER_PAGE,
+        (curPage+1) * NUM_REVIEWS_PER_PAGE,
+    )
+    tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope));
+    refillTmlItems(scope);
+    genPageBtn(curPage);
+}
+
 function refillTmlItems(records) {
-    const ppup = $('.lucky_popup');
     records.forEach(function (r){
         // console.log(r);
         const li_ele = $(`#${r.id}`);
@@ -685,26 +726,7 @@ function refillTmlItems(records) {
         }
         let clickable = li_ele.find('div.quote');
         if (clickable.length) {
-            li_ele.status = {
-                liked: false,
-                likers: [],
-                nlikers: -1,
-            };
-            clickable.css('cursor', 'pointer');
-            clickable.on('click', function (e) {
-                ppup.toggled = true;
-                if (ppup.last_time_click == li_ele) {
-                    ppup.fadeOut();
-                    ppup.last_time_click = null;
-                } else {
-                    ppup.hide()
-                    ppupRefill(li_ele, ppup);
-                    ppup.css({left: e.pageX-20});
-                    ppup.css({top: e.pageY-40});
-                    ppup.fadeIn();
-                    ppup.last_time_click = li_ele;
-                }
-            });
+            bindFreshLikeBtn(clickable, li_ele);
         }
 
     });
@@ -723,10 +745,15 @@ function buildTmlItems(records) {
             const liker_name = `${r.likes} 位bgmer`
             const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
             const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
-            const collect_info = `<div class="collectInfo"><div class="quote"><q>${r.comment}</q></div></div>`
+
+            let star_icon = '';
+            if (r.star > 0)
+                star_icon= `<span class="starstop-s"><span class="starlight stars${r.stars}"></span></span>`;
+
+            const collect_info = `<div class="collectInfo">${star_icon}<div class="quote"><q>${r.comment}</q></div></div>`
             const time_stamp = `<p class="date">${relativeTime(new Date(r.time))}</p>`
 
-            const span_info = `<span class="info clearit" >${span_subject}${liker_name}喜欢了 ${likee_name} 对 ${subject_name} 的短评: ${collect_info} ${time_stamp}</span>`
+            const span_info = `<span class="info clearit" >${span_subject}${liker_name} 喜欢了 ${likee_name} 对 ${subject_name} 的短评 ${collect_info} ${time_stamp}</span>`
             const li = `<li id=${r.id} class="clearit tml_item"> ${span_avatar} ${span_info} </li>`
             return li
         }
