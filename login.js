@@ -498,6 +498,7 @@ function addLoginPanel() {
             <h2 class="subtitle" style="cursor:pointer;">Feeling Lucky 设置</h2>
             <ul class="timeline" style="margin: 0px 5px; display: block;">
                 <li id="lucky_login_status"></li>
+                <li id="feeling_lucky_daily_config"></li>
             </ul>
         </div></div>
     `;
@@ -522,6 +523,18 @@ function addLoginPanel() {
     } catch {
         $('#lucky_login_status').html('请先登录班固米')
     }
+
+    // update feeling_lucky_daily_config
+    const DAILY_POPUP_REJECT_KEY = 'BGM_LUCKY_DAILY_POPUP_REJECT';
+    const daily_config = $('li#feeling_lucky_daily_config');
+    let checked = 'checked';
+    if (localStorage.getItem(DAILY_POPUP_REJECT_KEY)) checked = '';
+    daily_config.html(`鲤鱼飘旗: 每日弹出提醒 <input type="checkbox" id="feeling_lucky_daily_config_checkbox" ${checked}>`);
+    const checkbox = daily_config.find('#feeling_lucky_daily_config_checkbox');
+    checkbox.on('change', function(){
+        if (checkbox.is(':checked')) localStorage.removeItem(DAILY_POPUP_REJECT_KEY);
+        else localStorage.setItem(DAILY_POPUP_REJECT_KEY, '1');
+    });
 }
 
 function addLogoutBtn(login_info) {
