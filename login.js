@@ -570,7 +570,6 @@ function addLoginBtn() {
             console.log(`[bgm_luck] fetched ticket ${LOGIN_TOKEN_TICKET} for ${uid}`);
             // setTimeout( function() {
             const child = window.open(resp.oauth_url, "","width=550,height=550,toolbar=0,status=0,");
-            login_btn.
             callback_timeout = setTimeout(next_step, 5000) // enable manual toggle after 3s
             child_close_timer = setInterval(function() {           // detect child close 
                 if(child.closed) {
