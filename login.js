@@ -655,6 +655,12 @@ function addTimelineReviewTab() {
 let TML_REVIEW_CACHE;
 const NUM_REVIEWS_PER_PAGE = 5;
 
+function get_tml_uid_para(){
+    if (location.pathname.includes('/timeline') && location.pathname.includes('user/'))
+        return location.pathname.split('user/')[1].split('/timeline')[0];
+    return null;
+}
+
 function buildTimelineReview(){
     const tab_review_btn = $('#tab_lucky_review');
     const tml_content = $('#tmlContent');
@@ -667,12 +673,6 @@ function buildTimelineReview(){
     tml_content.html('<div class="loading"><img src="/img/loadingAnimation.gif"></div>');
 
     // when it is a user page tml instead of homepage url
-    function get_tml_uid_para(){
-        if (location.pathname.includes('/timeline') && location.pathname.includes('user/'))
-            return location.pathname.split('user/')[1].split('/timeline')[0];
-        return null;
-    }
-
     const uid = get_tml_uid_para()
     const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time' + (uid?`&uid=${uid}`:``);
     let ajax_req = {
@@ -694,7 +694,7 @@ function buildTimelineReview(){
                 <div class="page_inner"></div>
             </div>`)
             tml_content.find('#refresh_header').on('click', buildTimelineReview); // cannot add as onlick due to its a self calling
-            tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope, show_nlikers = uid?false:true))
+            tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope))
             refillTmlItems(scope);
             genPageBtn(0);
         },
@@ -800,7 +800,8 @@ function refillTmlItems(records) {
     });
 }
 
-function buildTmlItems(records, show_nlikers = true) {
+function buildTmlItems(records) {
+    const uid = get_tml_uid_para();
     const li_eles = records.map(
         function(r) {
             const user_img = '//lain.bgm.tv/pic/user/l/icon.jpg';
@@ -810,7 +811,7 @@ function buildTmlItems(records, show_nlikers = true) {
             const subject_img = '/img/no_img.gif';
             const span_subject = `<a href="/subject/${r.sid}" target="_blank"><img src="${subject_img}" alt class="rr subject_img" width="48"></a>`;
             // const liker_name = `<a href="/user/${r.last_liker}" class="l liker_id">${r.last_liker}</a>`;
-            const liker_name = show_nlikers?`${r.likes} 位bgmer `:``;
+            const liker_name = uid?``:`${r.likes} 位bgmer `;
             const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
             const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
 
