@@ -252,6 +252,7 @@ function hookPopup() {
             };
             const lucky_observer = new MutationObserver(lucky_callback);
             lucky_observer.observe(lucky.get(0), {childList: true, subtree:true});
+            // TODO need gc
             return true;
         }
         return false;
@@ -278,6 +279,7 @@ function hookPopup() {
         tml_obs_callback();
         const tml_observer = new MutationObserver(tml_obs_callback);
         tml_observer.observe(tml.get(0), {childList: true});
+        // TODO need gc
     }
 }
 
