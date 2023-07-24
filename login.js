@@ -272,7 +272,7 @@ function hookPopup() {
         const tml_obs_callback = function(){
             // console.log('observer triggered')
             // note: trigger tml parser only when reveiwTimeline is not active!
-            if (tml.find('#bgm_reivews_link').length == 0)
+            if (tml.find('#tml_lucky_reviews').length == 0)
                 bindReviews(tml.find('li.tml_item'), tml_selector, tml_parser);
         };
         tml_obs_callback();
@@ -649,19 +649,19 @@ function addTimelineReviewTab() {
     $('#timelineTabs > li:nth-child(2)').after(review_tl_raw);
     const tab_review_btn = $('#tab_lucky_review');
     tab_review_btn.css('cursor', 'pointer');
-    tab_review_btn.on('click', buildTimelineReview);
+    tab_review_btn.on('click', ()=>buildTimelineReview(false));
 }
 
 let TML_REVIEW_CACHE;
 const NUM_REVIEWS_PER_PAGE = 5;
 
-function get_tml_uid_para(){
+function get_tml_uid(){
     if (location.pathname.includes('/timeline') && location.pathname.includes('user/'))
         return location.pathname.split('user/')[1].split('/timeline')[0];
     return null;
 }
 
-function buildTimelineReview(){
+function buildTimelineReview(show_who_likes_me){
     const tab_review_btn = $('#tab_lucky_review');
     const tml_content = $('#tmlContent');
     $('#timelineTabs').find('a').each(
@@ -673,8 +673,11 @@ function buildTimelineReview(){
     tml_content.html('<div class="loading"><img src="/img/loadingAnimation.gif"></div>');
 
     // when it is a user page tml instead of homepage url
-    const uid = get_tml_uid_para()
-    const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time' + (uid?`&uid=${uid}`:``);
+    const is_user_tml = get_tml_uid()
+    let url_reviews;
+    if (show_who_likes_me)
+        url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time' + (is_user_tml?`&reviewer=${is_user_tml}`:``);
+    else url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time' + (is_user_tml?`&liker=${is_user_tml}`:``);
     let ajax_req = {
         timeout: 10000,
         crossDomain: true,
@@ -684,17 +687,26 @@ function buildTimelineReview(){
         success: function(resp) {
             TML_REVIEW_CACHE = resp
             const scope = TML_REVIEW_CACHE.slice(0, NUM_REVIEWS_PER_PAGE)
+            let header_a = `<a id="refresh_header" style="cursor:pointer;">${is_user_tml?'送出的喜欢':'最新'}</a>`
+            let header_b = is_user_tml?
+                '<a id="who_likes_me" style="cursor:pointer;">收到的喜欢</a>'
+                :`<a id="bgm_reivews_link" onclick="window.open('https://neutrinoliu.github.io/bgm_reviews/')" style="cursor:pointer;">Feeling Lucky Masonry</a>`;
+            if (is_user_tml) {
+                if (show_who_likes_me) header_b = `<b>${header_b}</b>`;
+                else header_a = `<b>${header_a}</b>`;
+            }
             tml_content.html(`
             <div id="timeline">
                 <h4 class="Header">
-                <a id="refresh_header" style="cursor:pointer;">最新</a> / 
-                <a id="bgm_reivews_link" onclick="window.open('https://neutrinoliu.github.io/bgm_reviews/')" style="cursor:pointer;">Feeling Lucky Masonry</a>
+                ${header_a} / ${header_b}
                 </h4>
                 <ul id="tml_lucky_reviews"></ul>
                 <div class="page_inner"></div>
             </div>`)
-            tml_content.find('#refresh_header').on('click', buildTimelineReview); // cannot add as onlick due to its a self calling
-            tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope))
+            tml_content.find('#refresh_header').on('click', ()=>buildTimelineReview(false)); 
+            if (is_user_tml) tml_content.find('#who_likes_me').on('click', ()=>buildTimelineReview(true));
+            // content fill
+            tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope, show_nliker=show_who_likes_me || !is_user_tml))
             refillTmlItems(scope);
             genPageBtn(0);
         },
@@ -801,8 +813,7 @@ function refillTmlItems(records) {
     });
 }
 
-function buildTmlItems(records) {
-    const uid = get_tml_uid_para();
+function buildTmlItems(records, show_nliker=true) {
     if (records.length == 0) return `<li class="clearit tml_item" style="text-align:center;"><a href="javascript:;" style="cursor:default;">没有最近喜欢的短评</a></li>`
     const li_eles = records.map(
         function(r) {
@@ -813,7 +824,7 @@ function buildTmlItems(records) {
             const subject_img = '/img/no_img.gif';
             const span_subject = `<a href="/subject/${r.sid}" target="_blank"><img src="${subject_img}" alt class="rr subject_img" width="48"></a>`;
             // const liker_name = `<a href="/user/${r.last_liker}" class="l liker_id">${r.last_liker}</a>`;
-            const liker_name = uid?``:`${r.likes} 位bgmer `;
+            const liker_name = show_nliker?`${r.likes} 位bgmer `:'';
             const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
             const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
 
