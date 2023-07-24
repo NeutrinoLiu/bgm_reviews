@@ -243,7 +243,7 @@ function hookPopup() {
     if (cbox_2.length) bindReviews(cbox_2.find('div.text'), cbox_selector, cbox_parser);
 
     const lucky = $('body.bangumi').find('#lucky_field');
-    const dock = $('body.bangumi').find('#dock');
+    // const dock = $('body.bangumi').find('#dock');
     function add_luck_card_observer() {
         if (lucky.length) {
             const lucky_callback = function(){
@@ -252,7 +252,6 @@ function hookPopup() {
             };
             const lucky_observer = new MutationObserver(lucky_callback);
             lucky_observer.observe(lucky.get(0), {childList: true, subtree:true});
-            // TODO need gc
             return true;
         }
         return false;
@@ -279,7 +278,6 @@ function hookPopup() {
         tml_obs_callback();
         const tml_observer = new MutationObserver(tml_obs_callback);
         tml_observer.observe(tml.get(0), {childList: true});
-        // TODO need gc
     }
 }
 
@@ -668,7 +666,15 @@ function buildTimelineReview(){
     tab_review_btn.attr('class', 'focus');
     tml_content.html('<div class="loading"><img src="/img/loadingAnimation.gif"></div>');
 
-    const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time';
+    // when it is a user page tml instead of homepage url
+    function get_tml_uid_para(){
+        if (location.pathname.includes('/timeline') && location.pathname.includes('user/'))
+            return location.pathname.split('user/')[1].split('/timeline')[0];
+        return null;
+    }
+
+    const uid = get_tml_uid_para()
+    const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time' + (uid?`&uid=${uid}`:``);
     let ajax_req = {
         timeout: 10000,
         crossDomain: true,
@@ -688,7 +694,7 @@ function buildTimelineReview(){
                 <div class="page_inner"></div>
             </div>`)
             tml_content.find('#refresh_header').on('click', buildTimelineReview); // cannot add as onlick due to its a self calling
-            tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope))
+            tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope, show_nlikers = uid?false:true))
             refillTmlItems(scope);
             genPageBtn(0);
         },
@@ -794,7 +800,7 @@ function refillTmlItems(records) {
     });
 }
 
-function buildTmlItems(records) {
+function buildTmlItems(records, show_nlikers = true) {
     const li_eles = records.map(
         function(r) {
             const user_img = '//lain.bgm.tv/pic/user/l/icon.jpg';
@@ -804,7 +810,7 @@ function buildTmlItems(records) {
             const subject_img = '/img/no_img.gif';
             const span_subject = `<a href="/subject/${r.sid}" target="_blank"><img src="${subject_img}" alt class="rr subject_img" width="48"></a>`;
             // const liker_name = `<a href="/user/${r.last_liker}" class="l liker_id">${r.last_liker}</a>`;
-            const liker_name = `${r.likes} 位bgmer`
+            const liker_name = show_nlikers?`${r.likes} 位bgmer `:``;
             const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
             const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
 
@@ -815,7 +821,7 @@ function buildTmlItems(records) {
             const collect_info = `<div class="collectInfo">${star_icon}<div class="quote"><q>${r.comment}</q></div></div>`
             const time_stamp = `<p class="date">${relativeTime(new Date(r.time))}</p>`
 
-            const span_info = `<span class="info clearit" >${span_subject}${liker_name} 喜欢了 ${likee_name} 对 ${subject_name} 的短评 ${collect_info} ${time_stamp}</span>`
+            const span_info = `<span class="info clearit" >${span_subject}${liker_name}喜欢了 ${likee_name} 对 ${subject_name} 的短评 ${collect_info} ${time_stamp}</span>`
             const li = `<li id=${r.id} class="clearit tml_item"> ${span_avatar} ${span_info} </li>`
             return li
         }
