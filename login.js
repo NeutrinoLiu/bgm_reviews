@@ -706,6 +706,7 @@ function buildTimelineReview(){
 }
 
 function genPageBtn(curPage) {
+    if (TML_REVIEW_CACHE.length <= NUM_REVIEWS_PER_PAGE) return;
     const tml_content = $('#tmlContent');
     const prevpg = `<a href="javascript:;" id="lucky_tml_prev_page" class="p">‹‹上一页</a>`;
     const nextpg = `<a href="javascript:;" id="lucky_tml_next_page" class="p">下一页 ››</a>`;
@@ -802,6 +803,7 @@ function refillTmlItems(records) {
 
 function buildTmlItems(records) {
     const uid = get_tml_uid_para();
+    if (records.length == 0) return `<li class="clearit tml_item" style="text-align:center;"><a href="javascript:;" style="cursor:default;">没有最近喜欢的短评</a></li>`
     const li_eles = records.map(
         function(r) {
             const user_img = '//lain.bgm.tv/pic/user/l/icon.jpg';
