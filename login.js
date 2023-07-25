@@ -1,6 +1,23 @@
 function addStyle() {
     const style = document.createElement('style');
     style.innerHTML = `
+    .subject_type_container {
+        overflow: hidden; 
+        position: absolute;
+        right: -5px;
+        bottom:6px;
+        height:32px;
+        text-align: left;
+    }
+    .subject_type_container .subject_type_watermark {
+        padding-top:10px;
+        font-family: helvetica, sans-serif;
+        font-weight:900;
+        font-size:3em;
+        letter-spacing:-2px;
+        opacity: 0.07;
+        cursor: default;
+    }
     :target {
         animation: target-fade 1s;
     }
@@ -775,6 +792,12 @@ function redrawPage(curPage) {
 }
 
 function refillTmlItems(records) {
+    const tid2type = function (tid){
+        const mapping = { 1:'BOOK', 2:'ANIME', 3:'MUSIC', 4:'GAME', 6:'REAL'}
+        const type = mapping[tid]
+        if (type) return type;
+        return ''
+    }
     records.forEach(function (r){
         const li_ele = $(`#${r.id}`);
         $.ajax({
@@ -810,6 +833,7 @@ function refillTmlItems(records) {
             success: function(resp) {
                 li_ele.find("a.subject_id").html(resp.name);
                 li_ele.find("img.subject_img").attr('src', resp.images.grid.replace('100','100x100'));
+                li_ele.find('div.subject_type_watermark').text(tid2type(resp.type));
             },
             error: function(resp) {
                 // console.warn("[bgm_luck] bangumi api fails");
@@ -843,6 +867,7 @@ function buildTmlItems(records, show_nliker=true) {
             const subject_img = '/img/no_img.gif';
             const span_subject = `<a href="/subject/${r.sid}" target="_blank"><img src="${subject_img}" alt class="rr subject_img" width="48"></a>`;
             // const liker_name = `<a href="/user/${r.last_liker}" class="l liker_id">${r.last_liker}</a>`;
+            const subject_type = `<div class="subject_type_container"><div class="subject_type_watermark"></div></div>`;
             const liker_name = show_nliker?`${r.likes} 位bgmer `:'';
             const likee_name = `<a href="/user/${r.uid}" class="l likee_id" target="_blank">${r.uid}</a>`;
             const subject_name = `<a href="/subject/${r.sid}" class="l subject_id" target="_blank">${r.sid}</a>`;
@@ -854,7 +879,7 @@ function buildTmlItems(records, show_nliker=true) {
             const collect_info = `<div class="collectInfo">${star_icon}<div class="quote"><q>${r.comment}</q></div></div>`
             const time_stamp = `<p class="date">${relativeTime(new Date(r.time))}</p>`
 
-            const span_info = `<span class="info clearit" >${span_subject}${liker_name}喜欢了 ${likee_name} 对 ${subject_name} 的短评 ${collect_info} ${time_stamp}</span>`
+            const span_info = `<span class="info clearit" >${span_subject}${subject_type}${liker_name}喜欢了 ${likee_name} 对 ${subject_name} 的短评 ${collect_info} ${time_stamp}</span>`
             const li = `<li id=${r.id} class="clearit tml_item"> ${span_avatar} ${span_info} </li>`
             return li
         }
