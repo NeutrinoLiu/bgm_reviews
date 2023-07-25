@@ -7,6 +7,7 @@ function addStyle() {
         right: -5px;
         bottom:6px;
         height:32px;
+        width:120px;
         text-align: left;
     }
     .subject_type_container .subject_type_watermark {
@@ -706,7 +707,7 @@ function buildTimelineReview(show_who_likes_me, sort_by_likes=false){
     const is_user_tml = get_tml_uid()
     const url_reviews = genURL(is_user_tml, show_who_likes_me, sort_by_likes);
     let ajax_req = {
-        timeout: 10000,
+        timeout: 15000,
         crossDomain: true,
         contentType: 'application/json',
         type: 'GET',
