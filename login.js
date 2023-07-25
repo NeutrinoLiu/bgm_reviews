@@ -661,7 +661,20 @@ function get_tml_uid(){
     return null;
 }
 
-function buildTimelineReview(show_who_likes_me){
+function genURL(is_user_tml, show_who_likes_me, sort_by_likes) {
+    const PATH = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes';
+    if (sort_by_likes)
+        return PATH + '?sort=likes'
+    else {
+        if (! is_user_tml) 
+            return PATH + '?sort=time';
+        else if (show_who_likes_me) 
+            return PATH + '?sort=time&reviewer=' + is_user_tml;
+        else return PATH + '?sort=time&liker=' + is_user_tml;
+    }
+}
+
+function buildTimelineReview(show_who_likes_me, sort_by_likes=false){
     const tab_review_btn = $('#tab_lucky_review');
     const tml_content = $('#tmlContent');
     $('#timelineTabs').find('a').each(
@@ -674,10 +687,7 @@ function buildTimelineReview(show_who_likes_me){
 
     // when it is a user page tml instead of homepage url
     const is_user_tml = get_tml_uid()
-    let url_reviews;
-    if (show_who_likes_me)
-        url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time' + (is_user_tml?`&reviewer=${is_user_tml}`:``);
-    else url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes?sort=time' + (is_user_tml?`&liker=${is_user_tml}`:``);
+    const url_reviews = genURL(is_user_tml, show_who_likes_me, sort_by_likes);
     let ajax_req = {
         timeout: 10000,
         crossDomain: true,
@@ -687,7 +697,11 @@ function buildTimelineReview(show_who_likes_me){
         success: function(resp) {
             TML_REVIEW_CACHE = resp
             const scope = TML_REVIEW_CACHE.slice(0, NUM_REVIEWS_PER_PAGE)
-            let header_a = `<a id="refresh_header" style="cursor:pointer;">${is_user_tml?'送出的喜欢':'最新'}</a>`
+            let header_a = is_user_tml?
+                `<a id="refresh_latest_btn" style="cursor:pointer;">送出的喜欢</a>`
+                : (sort_by_likes?
+                    `<a id="refresh_latest_btn" style="cursor:pointer;">最新喜欢</a> / <b><a id="refresh_popular_btn" style="cursor:pointer;">最多喜欢</a></b>`
+                    : `<b><a id="refresh_latest_btn" style="cursor:pointer;">最新喜欢</a></b> / <a id="refresh_popular_btn" style="cursor:pointer;">最多喜欢</a>`)
             let header_b = is_user_tml?
                 '<a id="who_likes_me" style="cursor:pointer;">收到的喜欢</a>'
                 :`<a id="bgm_reivews_link" onclick="window.open('https://neutrinoliu.github.io/bgm_reviews/')" style="cursor:pointer;">Feeling Lucky Masonry</a>`;
@@ -702,9 +716,14 @@ function buildTimelineReview(show_who_likes_me){
                 </h4>
                 <ul id="tml_lucky_reviews"></ul>
                 <div class="page_inner"></div>
-            </div>`)
-            tml_content.find('#refresh_header').on('click', ()=>buildTimelineReview(false)); 
-            if (is_user_tml) tml_content.find('#who_likes_me').on('click', ()=>buildTimelineReview(true));
+            </div>`) 
+            if (is_user_tml) {
+                tml_content.find('#refresh_latest_btn').on('click', ()=>buildTimelineReview(false));
+                tml_content.find('#who_likes_me').on('click', ()=>buildTimelineReview(true));
+            } else {
+                tml_content.find('#refresh_latest_btn').on('click', ()=>buildTimelineReview(false));
+                tml_content.find('#refresh_popular_btn').on('click', ()=>buildTimelineReview(false, sort_by_likes=true));
+            }
             // content fill
             tml_content.find('#tml_lucky_reviews').html(buildTmlItems(scope, show_nliker=show_who_likes_me || !is_user_tml))
             refillTmlItems(scope);
