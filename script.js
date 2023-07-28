@@ -6,7 +6,31 @@ const RETRY = 3;
 const RETRY_INTERVAL = 2000;
 
 setupScroll();
-refill('time');
+(function(){
+    const urlParams = new URLSearchParams(window.location.search);
+    const liker = urlParams.get('liker');
+    const sort = urlParams.get('sort');
+    if (liker) {
+        const url = "https://api.bgm.tv/v0/users/" + liker;
+        let ajax_req = {
+            timeout: 5000,
+            contentType: 'application/json',
+            type: 'GET',
+            url: url,
+            success: function(resp) {
+                $('div#myheader').find("h1").hide()
+                $('div#myheader').find("h1").html(`<a href="https://bgm.tv/user/${liker}" target="_blank">${resp.nickname}</a> 最近喜欢的短评`);
+                $('div#myheader').find("h1").fadeIn()
+            },
+            error: function(resp) {
+                console.warn("[bgm_luck] bangumi api fails");
+            }
+        }
+        $.ajax(ajax_req);
+        refill(`time&liker=${liker}`)
+    } else if (sort) refill(sort);
+    else refill('time');
+})();
 
 
 function autorefill() {
@@ -78,7 +102,6 @@ function drawNewCards(n) {
 }
 function fetchList(sort="time"){
     // deprecated lucky
-    const url_lucky = 'https://eastasia.azure.data.mongodb-api.com/app/luckycomment-vlqof/endpoint/lucky_list';
     const url_reviews = 'https://eastasia.azure.data.mongodb-api.com/app/luckyreviewany-rclim/endpoint/recent_likes';
     let ajax_req = {
         tryCount: 0,
@@ -91,8 +114,12 @@ function fetchList(sort="time"){
         url: url_reviews + "?sort=" + sort,
         success: function(resp) {
             $('#canvas_inner').html(`<div class="container"></div>`);
-            storeCache(resp);
-            drawNewCards(15);
+            if (resp.length) {
+                storeCache(resp);
+                drawNewCards(15);
+            } else {
+                $('.dummy_bg').html('<p class="empty_prompt">no records</p>')
+            }
         },
         error: function(resp) {
             ajax_req.tryCount++;

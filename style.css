@@ -17,7 +17,14 @@ body {
     /* background-image:  url('bg.png'); */
     background-attachment: fixed;
     background-image: url("clean-textile.png"), linear-gradient(90deg, #ee9ca7 0%, #ffdde1 100%);
+}
 
+#myheader h1 a{
+    text-decoration:none;
+    color: #4f4f4f;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
 }
 
 hr.rounded {
@@ -347,4 +354,15 @@ p {
     left:auto;
     right:15%;
     animation-delay: .3s;
+}
+
+p.empty_prompt {
+    text-align:center;
+    top:40%;
+    position: relative;
+    font-size: 2em;
+    color: white;
+    font-family: 'Bitter', serif;
+    font-weight: 500;
+    text-shadow: 0px 0px 5px #a44545;
 }
