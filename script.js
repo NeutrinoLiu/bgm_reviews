@@ -299,11 +299,11 @@ function cardTemplate(cmt) {
             </div>
         </div>`;
     const like_icon = `
-        <div class="like_icon">
-            ${like_filled}
-        </div>
         <div class="like_number">
             ${cmt.likes}
+        </div>
+        <div class="like_icon">
+            ${like_filled}
         </div>
     `
     const card = `
