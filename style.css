@@ -90,6 +90,12 @@ hr.rounded {
     z-index: 3;
 }
 
+.dummy_bg_nonoverlay {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+}
+
 #canvas_inner {
     padding-top: 105px;
     padding-left: 10%;
@@ -366,4 +372,32 @@ p.empty_prompt {
     font-family: 'Bitter', serif;
     font-weight: 500;
     text-shadow: 0px 0px 5px #a44545;
+}
+
+.sort-indicator::after {
+    content: '\25B2';
+    margin-left: 5px;
+}
+.sort-indicator.descending::after {
+    content: '\25BC';
+}
+.text-center-header {
+    text-align: center;
+}
+.pagination .page-link {
+    color: #888;  /* grey text color */
+    background: rgba(254,254,254,0.76);
+    border-color: #fff;
+    backdrop-filter: blur(20px) contrast(95%);
+
+}
+.pagination .page-item.active .page-link {
+    color: #fff;
+    background-color: #525252;
+    border-color: #fff;
+}
+.pagination .page-link:hover {
+    color: #fff;
+    background-color: #525252;
+    border-color: #fff;
 }

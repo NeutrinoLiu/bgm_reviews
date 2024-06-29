@@ -116,7 +116,7 @@ function fetchList(sort="time"){
             $('#canvas_inner').html(`<div class="container"></div>`);
             if (resp.length) {
                 storeCache(resp);
-                drawNewCards(15);
+                drawNewCards(30);
             } else {
                 $('.dummy_bg').html('<p class="empty_prompt">no records</p>')
             }
