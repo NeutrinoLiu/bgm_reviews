@@ -1,7 +1,7 @@
 let DATA = null;
 let CUR_PAGE = 1;
 let NUM_PER_PAGE = 40;
-let CUR_SORT = null;
+let CUR_SORT = "date";
 let CUR_SORT_ASC = true;
 
 const RETRY = 3;
@@ -34,26 +34,30 @@ function fetchList(){
         success: function(resp) {
             deleteLoading();
             $('#canvas_inner').html(`
-                <div class="table_container mt-5">
-                <table class="table table-striped" id="blogTable">
-                    <thead>
-                        <tr>
-                            <th>标题</th>
-                            <th>作者</th>
-                            <th>理由</th>
-                            <th>日期</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Table rows will be inserted here -->
-                    </tbody>
-                </table>
-                <nav aria-label="Page navigation">
+            <div class="table_container mt-5">
+                <div class="banner_mid elegent">
+                    <table class="table table-striped" id="blogTable">
+                        <thead>
+                            <tr>
+                                <th style="font-weight:700;" class="date-column">日期</th>
+                                <th style="font-weight:700;">标题</th>
+                                <th style="font-weight:700;">作者</th>
+                                <th style="font-weight:700;">理由</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Table rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            `);
+            $('#myfooter').before(`
+            <nav aria-label="Page navigation">
                     <ul class="pagination" id="pagination">
                         <!-- Pagination buttons will be inserted here -->
                     </ul>
-                </nav>
-            </div>`);
+            </nav>`)
             console.log(resp.slice(0,10))
             DATA = resp;
             CUR_PAGE = 1;
@@ -62,6 +66,7 @@ function fetchList(){
             displayTable(CUR_PAGE);
             setupPagination();
             setupSortingListeners();
+            sortData('date');
         },
         error: function(resp) {
             ajax_req.tryCount++;
@@ -96,7 +101,7 @@ function sortData(column) {
         CUR_SORT_ASC = true;
     }
 
-    const currentHeader = document.querySelector(`#blogTable th:nth-child(${['title', 'author', 'reason', 'date'].indexOf(column) + 1})`);
+    const currentHeader = document.querySelector(`#blogTable th:nth-child(${['date', 'title', 'author', 'reason'].indexOf(column) + 1})`);
     currentHeader.classList.add('sort-indicator');
     if (!CUR_SORT_ASC) {
         currentHeader.classList.add('descending');
@@ -119,23 +124,33 @@ function sortData(column) {
     displayTable(1);
     setupPagination();
   }
-  
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function displayTable(page) {
     const tableBody = document.getElementById('tableBody');
     const startIndex = (page - 1) * NUM_PER_PAGE;
     const endIndex = startIndex + NUM_PER_PAGE;
     const pageData = DATA.slice(startIndex, endIndex);
-
+    const tb = $('#tableBody');
+    tb.hide()
     tableBody.innerHTML = '';
     pageData.forEach(item => {
         const row = `<tr>
-            <td><a href="https://bgm.tv/blog/${item.blog}" target="_blank">${item.title}</a></td>
-            <td>${item.author}</td>
-            <td>${item.reason}</td>
-            <td>${new Date(item.date).toLocaleString().split(',')[0]}</td>
+            <td class="date-column table_font">${formatDate(item.date)}</td>
+            <td ><a href="https://bgm.tv/blog/${item.blog}" target="_blank" class="table_font">${item.title}</a></td>
+            <td ><a href="https://bgm.tv/user/${item.author}" target="_blank" class="table_font">${item.author}</a></td>
+            <td class="table_font">${item.reason}</td>
         </tr>`;
         tableBody.innerHTML += row;
     });
+    tb.fadeIn()
 }
 
 function setupPagination() {
@@ -170,7 +185,13 @@ headers.forEach(header => {
     header.style.cursor = 'pointer';
     header.addEventListener('click', () => {
         const column = header.textContent.toLowerCase();
-        sortData(column === 'blog id' ? 'blog' : column);
+        const mapping = {
+            "标题" : "title",
+            "作者" : "author",
+            "理由" : "reason",
+            "日期" : "date"
+        }
+        sortData(mapping[column]);
     });
 });
 }
