@@ -120,8 +120,8 @@ function sortData(column) {
         if (valueA > valueB) return CUR_SORT_ASC ? 1 : -1;
         return 0;
     });
-
-    displayTable(1);
+    CUR_PAGE = 1;
+    displayTable(CUR_PAGE);
     setupPagination();
   }
 
