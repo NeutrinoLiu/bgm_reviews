@@ -113,7 +113,7 @@ function fetchList(sort="time"){
         type: 'GET',
         url: url_reviews + "?sort=" + sort,
         success: function(resp) {
-            $('#canvas_inner').html(`<div class="container"></div>`);
+            $('#canvas_inner').html(`<div class="cards_container"></div>`);
             if (resp.length) {
                 storeCache(resp);
                 drawNewCards(30);
@@ -139,7 +139,7 @@ function fetchList(sort="time"){
 }
 function addCard(cmt) {
     cmt.uid = cmt.uid.replace(/[\uFEFF\u00EF\u00BB\u00BF]/g,'');
-    $('.container').append(cardTemplate(cmt));
+    $('.cards_container').append(cardTemplate(cmt));
     bindClick(cmt)
     resizeGridItem(cmt.id);
     updateMetaInfo(cmt);
@@ -318,7 +318,7 @@ function cardTemplate(cmt) {
 function resizeGridItem(item_id){
     const item = $(`#${item_id}`)[0];
     const cmt = item.getElementsByClassName('comment_container')[0];
-    const grid = document.getElementsByClassName("container")[0];
+    const grid = document.getElementsByClassName("cards_container")[0];
     const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
     const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
     const rowSpan = Math.ceil((290 + cmt.getBoundingClientRect().height)/(rowHeight+rowGap));

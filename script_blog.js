@@ -158,25 +158,63 @@ function setupPagination() {
     const paginationElement = document.getElementById('pagination');
     paginationElement.innerHTML = '';
 
-    for (let i = 1; i <= pageCount; i++) {
+    // for (let i = 1; i <= pageCount; i++) {
+    //     const li = document.createElement('li');
+    //     li.classList.add('page-item');
+    //     if (i === CUR_PAGE) {
+    //         li.classList.add('active');
+    //     }
+    //     const a = document.createElement('a');
+    //     a.classList.add('page-link');
+    //     a.href = '#';
+    //     a.textContent = i;
+    //     a.addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         CUR_PAGE = i;
+    //         displayTable(CUR_PAGE);
+    //         setupPagination();
+    //     });
+    //     li.appendChild(a);
+    //     paginationElement.appendChild(li);
+    // }
+    const page_span = 3;
+    let start = Math.max(1, CUR_PAGE - page_span);
+    let end = Math.min(pageCount, CUR_PAGE + page_span);
+    if (start === 1) {
+        end = Math.min(pageCount, start + 2 * page_span);
+    }
+    if (end === pageCount) {
+        start = Math.max(1, end - 2 * page_span);
+    }
+    function add_page_btn(text, page){
         const li = document.createElement('li');
         li.classList.add('page-item');
-        if (i === CUR_PAGE) {
+        if (page === CUR_PAGE) {
             li.classList.add('active');
         }
         const a = document.createElement('a');
         a.classList.add('page-link');
         a.href = '#';
-        a.textContent = i;
+        a.textContent = text;
         a.addEventListener('click', (e) => {
             e.preventDefault();
-            CUR_PAGE = i;
+            CUR_PAGE = page;
             displayTable(CUR_PAGE);
             setupPagination();
         });
         li.appendChild(a);
         paginationElement.appendChild(li);
     }
+    if (CUR_PAGE > 1) {
+        add_page_btn('❚◀', 1);
+    }
+    for (let i = start; i <= end; i++) {
+        add_page_btn(i, i);
+    }
+    if (pageCount > CUR_PAGE) {
+        add_page_btn('▶❚', pageCount);
+    }
+
 }
 
 function setupSortingListeners() {
