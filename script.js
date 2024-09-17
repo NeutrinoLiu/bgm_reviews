@@ -324,5 +324,11 @@ function resizeGridItem(item_id){
     const rowSpan = Math.ceil((290 + cmt.getBoundingClientRect().height)/(rowHeight+rowGap));
     $(`#${item_id}`).attr("style","grid-row: span "+ rowSpan);
   }
+
+(function(){
+    const footer_height = $('#myfooter').height();
+    const my_blur_banner = $('.gradient-blur');
+    my_blur_banner.css('height', `${footer_height + 200}px`);
+})();
   
   

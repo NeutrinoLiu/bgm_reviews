@@ -234,3 +234,8 @@ headers.forEach(header => {
 });
 }
 
+(function(){
+    const footer_height = $('#myfooter').height();
+    const my_blur_banner = $('.gradient-blur');
+    my_blur_banner.css('height', `${footer_height + 200}px`);
+})();
