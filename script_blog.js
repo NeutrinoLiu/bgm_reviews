@@ -235,7 +235,12 @@ headers.forEach(header => {
 }
 
 (function(){
+    const header_height = $('#myheader').height();
+    const header_blur = $('#myheaderblur');
+    header_blur.css('height', `${header_height + 100}px`);
+
     const footer_height = $('#myfooter').height();
-    const my_blur_banner = $('.gradient-blur');
-    my_blur_banner.css('height', `${footer_height + 200}px`);
+    const footer_blur = $('#myfooterblur');
+    footer_blur.css('height', `${footer_height + 150}px`);
 })();
+  

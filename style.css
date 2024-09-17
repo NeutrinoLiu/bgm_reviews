@@ -103,6 +103,14 @@ hr.rounded {
     padding-bottom: 105px;
     position: relative;
 }
+
+.banner_invert {
+    -moz-transform: scale(-1, -1);
+    -o-transform: scale(-1, -1);
+    -webkit-transform: scale(-1, -1);
+    transform: scale(-1, -1);
+}
+
 .banner_span {
     position: fixed;
     width: 90%;
@@ -111,7 +119,7 @@ hr.rounded {
     -webkit-border-radius: 15px;
     border-radius: 15px;
     padding: 20px;
-    z-index: 5;
+    z-index: 10;
 }
 .banner_mid {
     -moz-border-radius: 15px;
@@ -463,14 +471,14 @@ p.empty_prompt {
 .gradient-blur::before {
   content: "";
   z-index: 1;
-  -webkit-backdrop-filter: blur(0.5px);
-  backdrop-filter: blur(0.5px);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
   mask: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 1) 10%,
     rgba(0, 0, 0, 1) 20%,
-    rgba(0, 0, 0, 1) 40%,
-    rgba(0, 0, 0, 0) 60%
+    rgba(0, 0, 0, 0) 30%
   );
 }
 .gradient-blur > div:nth-of-type(1) {
@@ -479,43 +487,43 @@ p.empty_prompt {
   backdrop-filter: blur(2px);
   mask: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0) 20%,
-    rgba(0, 0, 0, 1) 40%,
-    rgba(0, 0, 0, 1) 60%,
-    rgba(0, 0, 0, 0) 80%
+    rgba(0, 0, 0, 0) 10%,
+    rgba(0, 0, 0, 1) 20%,
+    rgba(0, 0, 0, 1) 30%,
+    rgba(0, 0, 0, 0) 40%
   );
 }
 .gradient-blur > div:nth-of-type(2) {
   z-index: 3;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   mask: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0) 40%,
-    rgba(0, 0, 0, 1) 60%,
-    rgba(0, 0, 0, 1) 80%,
+    rgba(0, 0, 0, 0) 20%,
+    rgba(0, 0, 0, 1) 30%,
+    rgba(0, 0, 0, 1) 40%,
     rgba(0, 0, 0, 0) 100%
   );
 }
 .gradient-blur > div:nth-of-type(3) {
   z-index: 4;
-  -webkit-backdrop-filter: blur(32px);
-  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   mask: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0) 60%,
-    rgba(0, 0, 0, 1) 80%,
+    rgba(0, 0, 0, 0) 30%,
+    rgba(0, 0, 0, 1) 40%,
     rgba(0, 0, 0, 1) 100%
   );
 }
 .gradient-blur::after {
   content: "";
   z-index: 5;
-  -webkit-backdrop-filter: blur(128px);
-  backdrop-filter: blur(128px);
+  -webkit-backdrop-filter: blur(64px);
+  backdrop-filter: blur(64px);
   mask: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0) 80%,
+    rgba(0, 0, 0, 0) 40%,
     rgba(0, 0, 0, 1) 100%
   );
 }
