@@ -333,11 +333,12 @@ p {
     /* border-style: solid;
     border-color: green; */
     width: auto;
-    padding: 5px 15px 15px 15px;
+    padding: 5px 15px 5px 15px;
     width: 100%;
 }
 .comment p {
     font-weight: 500;
+    margin-bottom: 0;
 }
 
 .loading_wrapper{

@@ -321,7 +321,7 @@ function resizeGridItem(item_id){
     const grid = document.getElementsByClassName("cards_container")[0];
     const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
     const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
-    const rowSpan = Math.ceil((290 + cmt.getBoundingClientRect().height)/(rowHeight+rowGap));
+    const rowSpan = Math.ceil((285 + cmt.getBoundingClientRect().height)/(rowHeight+rowGap));
     $(`#${item_id}`).attr("style","grid-row: span "+ rowSpan);
   }
 
