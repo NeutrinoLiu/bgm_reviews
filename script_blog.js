@@ -241,6 +241,6 @@ headers.forEach(header => {
 
     const footer_height = $('#myfooter').height();
     const footer_blur = $('#myfooterblur');
-    footer_blur.css('height', `${footer_height + 150}px`);
+    footer_blur.css('height', `${footer_height + 100}px`);
 })();
   
